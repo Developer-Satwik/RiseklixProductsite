@@ -1836,3 +1836,92 @@ if ('IntersectionObserver' in window) {
 
   render('chatgpt', false);
 })();
+
+// --- v20260924 Commercial Discovery scroll story ---
+(() => {
+  const root = document.querySelector('[data-discovery-story]');
+  if (!root) return;
+
+  const stage = root.querySelector('[data-story-stage]');
+  const readout = root.querySelector('[data-story-readout]');
+  const progress = root.querySelector('.story-progress');
+  const steps = Array.from(root.querySelectorAll('[data-story-step]'));
+  const panels = Array.from(root.querySelectorAll('[data-story-panel]'));
+  const dots = Array.from(root.querySelectorAll('[data-story-dot]'));
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const labels = {
+    check: '01 / CHECK',
+    evidence: '02 / EVIDENCE',
+    change: '03 / CHANGE',
+    recheck: '04 / RECHECK'
+  };
+
+  let active = 'check';
+
+  function setState(next, { focus = false } = {}) {
+    if (!labels[next]) return;
+    active = next;
+    if (stage) stage.dataset.storyState = next;
+    if (readout) readout.textContent = labels[next];
+
+    steps.forEach((step) => {
+      const selected = step.dataset.storyStep === next;
+      step.classList.toggle('is-active', selected);
+      step.setAttribute('aria-current', selected ? 'step' : 'false');
+      if (selected && focus) step.focus({ preventScroll: true });
+    });
+
+    panels.forEach((panel) => {
+      const selected = panel.dataset.storyPanel === next;
+      panel.classList.toggle('is-active', selected);
+      panel.setAttribute('aria-hidden', selected ? 'false' : 'true');
+    });
+
+    const index = Math.max(0, steps.findIndex((step) => step.dataset.storyStep === next));
+    dots.forEach((dot, dotIndex) => dot.classList.toggle('is-active', dotIndex <= index));
+    if (progress) progress.style.setProperty('--story-progress', `${(index / Math.max(1, steps.length - 1)) * 100}%`);
+
+    if (!reduced && stage && window.innerWidth > 1000) {
+      stage.animate(
+        [
+          { boxShadow: '0 44px 120px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.07)' },
+          { boxShadow: '0 48px 130px rgba(0,0,0,.48), 0 0 0 1px rgba(199,255,45,.08), inset 0 1px 0 rgba(255,255,255,.08)' },
+          { boxShadow: '0 44px 120px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.07)' }
+        ],
+        { duration: 360, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      );
+    }
+  }
+
+  steps.forEach((step) => {
+    step.addEventListener('click', () => setState(step.dataset.storyStep));
+    step.addEventListener('keydown', (event) => {
+      if (!['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) return;
+      event.preventDefault();
+      const currentIndex = steps.indexOf(step);
+      if (event.key === 'Enter' || event.key === ' ') {
+        setState(step.dataset.storyStep);
+        return;
+      }
+      const direction = event.key === 'ArrowDown' ? 1 : -1;
+      const next = steps[(currentIndex + direction + steps.length) % steps.length];
+      setState(next.dataset.storyStep, { focus: true });
+    });
+  });
+
+  if ('IntersectionObserver' in window && window.innerWidth > 1000) {
+    const observer = new IntersectionObserver((entries) => {
+      const candidates = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (!candidates.length) return;
+      setState(candidates[0].target.dataset.storyStep);
+    }, {
+      threshold: [0.2, 0.4, 0.6, 0.8],
+      rootMargin: '-24% 0px -42% 0px'
+    });
+    steps.forEach((step) => observer.observe(step));
+  }
+
+  setState(active);
+})();
