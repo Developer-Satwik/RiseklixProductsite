@@ -4591,3 +4591,65 @@ body{
   text-underline-offset:5px!important;
   text-decoration-color:var(--acid)!important;
 }
+
+
+/* --- v20260924 interactive recommendation trace --- */
+.evidence-console{min-height:0;transform-style:preserve-3d}
+.console-system-shell{margin:.15rem 0 .8rem}
+.console-system-label{display:block;font-family:var(--mono);font-size:.54rem;letter-spacing:.11em;text-transform:uppercase;color:#7f7a91;margin:0 0 .42rem .08rem}
+.console-systems{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin:0}
+.console-system{appearance:none;-webkit-appearance:none;font:700 .58rem/1 var(--mono);text-align:center;padding:.62rem .35rem;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);color:#cbc6d8;cursor:pointer;transition:border-color .2s ease,background .2s ease,color .2s ease,transform .2s ease,box-shadow .2s ease}
+.console-system:hover{border-color:rgba(199,255,45,.34);color:#fff}
+.console-system[aria-selected="true"]{background:var(--acid);border-color:var(--acid);color:#050509;box-shadow:0 8px 26px rgba(199,255,45,.14);transform:translateY(-1px)}
+.console-system:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.console-panel{position:relative}
+.console-decision-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.25rem}
+.console-model-readout{font-family:var(--mono);font-size:.53rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(56,212,255,.2);background:rgba(56,212,255,.07);padding:.34rem .48rem;border-radius:999px}
+.console-result{position:relative;overflow:hidden;transition:border-color .22s ease,background .22s ease}
+.console-result:after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tone,var(--cyan));opacity:.9}
+.console-result[data-tone="positive"]{--tone:var(--acid);border-color:rgba(199,255,45,.22);background:linear-gradient(135deg,rgba(199,255,45,.075),rgba(255,255,255,.035))}
+.console-result[data-tone="warning"]{--tone:var(--amber);border-color:rgba(255,176,31,.22);background:linear-gradient(135deg,rgba(255,176,31,.07),rgba(255,255,255,.035))}
+.console-result[data-tone="negative"]{--tone:var(--hot);border-color:rgba(255,62,165,.24);background:linear-gradient(135deg,rgba(255,62,165,.075),rgba(255,255,255,.035))}
+.console-result[data-tone="neutral"]{--tone:var(--cyan);border-color:rgba(56,212,255,.2)}
+.console-trace{display:grid;grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr) 38px minmax(0,1fr);align-items:stretch;gap:.35rem;margin:.7rem 0}
+.trace-node{min-width:0;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);border-radius:16px;padding:.78rem .82rem;display:flex;flex-direction:column;gap:.32rem}
+.trace-node span{font:700 .5rem/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#807b91}
+.trace-node strong{font-family:var(--display);font-size:.78rem;line-height:1.12;letter-spacing:-.025em;color:#dad6e4}
+.trace-node-finding{border-color:rgba(199,255,45,.2);background:rgba(199,255,45,.045)}
+.trace-node-finding strong{color:#fff}
+.trace-link{position:relative;align-self:center;height:1px;background:linear-gradient(90deg,rgba(56,212,255,.12),rgba(199,255,45,.55))}
+.trace-link:after{content:"";position:absolute;top:50%;left:0;width:5px;height:5px;border-radius:50%;background:var(--acid);box-shadow:0 0 13px rgba(199,255,45,.8);transform:translateY(-50%)}
+.console-action{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--acid);font:700 .57rem/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:.5rem 0 .5rem .6rem;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:.38rem}
+.console-action span{transition:transform .2s ease}
+.console-action:hover span,.console-action[aria-expanded="true"] span{transform:translateX(4px)}
+.console-action:focus-visible{outline:2px solid var(--acid);outline-offset:4px;border-radius:6px}
+.console-plan{margin-top:.55rem;border:1px solid rgba(199,255,45,.18);background:linear-gradient(135deg,rgba(199,255,45,.08),rgba(33,76,255,.08));border-radius:18px;padding:.9rem 1rem;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:.3rem 1rem;align-items:start}
+.console-plan[hidden]{display:none}
+.console-plan small{font:700 .5rem/1.2 var(--mono);letter-spacing:.1em;color:#8e899b;text-transform:uppercase;display:block;margin-bottom:.28rem}
+.console-plan strong{font-family:var(--display);font-size:.9rem;line-height:1.08;letter-spacing:-.035em}
+.console-plan p{margin:0;color:#bcb7c8;font-size:.76rem;line-height:1.45}
+.console-plan-foot{grid-column:1/-1;font:700 .5rem/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--acid);padding-top:.45rem;border-top:1px solid rgba(255,255,255,.07);margin-top:.35rem}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+@media (prefers-reduced-motion:no-preference){
+  .trace-link:after{animation:tracePulse 1.9s ease-in-out infinite}
+  .console-panel.is-switching .console-card,.console-panel.is-switching .trace-node{animation:consoleRefresh .28s cubic-bezier(.2,.7,.2,1)}
+}
+@keyframes tracePulse{0%,100%{left:0;opacity:.2}45%,55%{opacity:1}100%{left:calc(100% - 5px)}}
+@keyframes consoleRefresh{0%{opacity:.35;transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
+
+@media(max-width:680px){
+  .console-systems{grid-template-columns:repeat(2,1fr)}
+  .console-trace{grid-template-columns:1fr;gap:.3rem}
+  .trace-link{width:1px;height:18px;margin:0 0 0 1.2rem;background:linear-gradient(180deg,rgba(56,212,255,.12),rgba(199,255,45,.55))}
+  .trace-link:after{left:50%;top:0;transform:translateX(-50%)}
+  .console-plan{grid-template-columns:1fr}
+  .console-plan-foot{grid-column:1}
+  .console-finding{align-items:flex-start;flex-direction:column}
+  .console-action{padding-left:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .console-system,.console-result,.console-action span{transition:none!important}
+  .trace-link:after{animation:none!important;left:calc(100% - 5px)}
+  .console-panel.is-switching .console-card,.console-panel.is-switching .trace-node{animation:none!important}
+}

@@ -1675,3 +1675,164 @@ if ('IntersectionObserver' in window) {
     });
   });
 })();
+
+
+// --- v20260924 interactive recommendation trace ---
+(() => {
+  const root = document.querySelector('[data-product-console]');
+  if (!root) return;
+
+  const tabs = Array.from(root.querySelectorAll('[data-console-system]'));
+  const panel = root.querySelector('.console-panel');
+  const model = root.querySelector('[data-console-model]');
+  const companyState = root.querySelector('[data-company-state]');
+  const companyNote = root.querySelector('[data-company-note]');
+  const companyCard = root.querySelector('[data-company-card]');
+  const competitorState = root.querySelector('[data-competitor-state]');
+  const competitorNote = root.querySelector('[data-competitor-note]');
+  const competitorCard = root.querySelector('[data-competitor-card]');
+  const traceAnswer = root.querySelector('[data-trace-answer]');
+  const traceSource = root.querySelector('[data-trace-source]');
+  const traceFinding = root.querySelector('[data-trace-finding]');
+  const finding = root.querySelector('[data-console-finding]');
+  const action = root.querySelector('[data-console-action]');
+  const plan = root.querySelector('[data-console-plan]');
+  const planTitle = root.querySelector('[data-plan-title]');
+  const planDetail = root.querySelector('[data-plan-detail]');
+  const announcer = root.querySelector('[data-console-announcer]');
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const states = {
+    chatgpt: {
+      label: 'ChatGPT',
+      company: 'Included',
+      companyNote: 'You make the shortlist, but not as the first choice.',
+      companyTone: 'positive',
+      competitor: 'Recommended',
+      competitorNote: 'Another provider is named first.',
+      competitorTone: 'warning',
+      answer: 'Your company appears in the shortlist.',
+      source: 'Competitor comparison pages carry denser proof.',
+      traceFinding: 'Comparison proof is too thin.',
+      finding: 'Build one evidence-backed comparison page.',
+      planTitle: 'Make the comparison decision easier to verify.',
+      planDetail: 'Show who you fit, the tradeoffs, concrete proof, and why a buyer would choose you over the leading alternative.'
+    },
+    gemini: {
+      label: 'Gemini',
+      company: 'Not included',
+      companyNote: 'The answer explains the category but skips your brand.',
+      companyTone: 'negative',
+      competitor: 'Included',
+      competitorNote: 'A clearer category match earns the slot.',
+      competitorTone: 'warning',
+      answer: 'The answer names alternatives without your company.',
+      source: 'Category guides make competitor fit easier to verify.',
+      traceFinding: 'Your buyer fit is not explicit enough.',
+      finding: 'Clarify the buyer and category you are built for.',
+      planTitle: 'Create one canonical buyer-fit page.',
+      planDetail: 'State the buyer, problem, constraints, alternatives, and proof in language that can be verified without inferring your positioning.'
+    },
+    claude: {
+      label: 'Claude',
+      company: 'Included',
+      companyNote: 'You appear, but the support for choosing you is generic.',
+      companyTone: 'positive',
+      competitor: 'Included',
+      competitorNote: 'Both brands make the answer.',
+      competitorTone: 'neutral',
+      answer: 'Both companies appear in the response.',
+      source: 'The competitor has more specific case evidence.',
+      traceFinding: 'Your evidence lacks decision-level detail.',
+      finding: 'Replace broad claims with concrete proof.',
+      planTitle: 'Strengthen evidence where the decision happens.',
+      planDetail: 'Add scoped examples, measurable outcomes, limitations, and sourceable proof directly on the pages buyers and AI systems use to compare options.'
+    },
+    perplexity: {
+      label: 'Perplexity',
+      company: 'Cited only',
+      companyNote: 'Your content is used as a source, but your company is not the recommendation.',
+      companyTone: 'neutral',
+      competitor: 'Recommended',
+      competitorNote: 'Another provider gets the commercial choice.',
+      competitorTone: 'warning',
+      answer: 'Your page is cited while another company is recommended.',
+      source: 'Your article informs the answer; competitor proof closes the choice.',
+      traceFinding: 'Cited does not equal chosen.',
+      finding: 'Connect useful content to decision proof.',
+      planTitle: 'Bridge information authority and commercial proof.',
+      planDetail: 'Keep the useful source content, then connect it to clear product fit, comparisons, evidence, and a page that supports the actual buying decision.'
+    }
+  };
+
+  const animateRefresh = () => {
+    if (!panel || reduceMotion) return;
+    panel.classList.remove('is-switching');
+    void panel.offsetWidth;
+    panel.classList.add('is-switching');
+    window.setTimeout(() => panel.classList.remove('is-switching'), 320);
+  };
+
+  const render = (key, announce = true) => {
+    const state = states[key] || states.chatgpt;
+    tabs.forEach((tab) => {
+      const active = tab.dataset.consoleSystem === key;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.tabIndex = active ? 0 : -1;
+    });
+
+    if (model) model.textContent = state.label;
+    if (companyState) companyState.textContent = state.company;
+    if (companyNote) companyNote.textContent = state.companyNote;
+    if (companyCard) companyCard.dataset.tone = state.companyTone;
+    if (competitorState) competitorState.textContent = state.competitor;
+    if (competitorNote) competitorNote.textContent = state.competitorNote;
+    if (competitorCard) competitorCard.dataset.tone = state.competitorTone;
+    if (traceAnswer) traceAnswer.textContent = state.answer;
+    if (traceSource) traceSource.textContent = state.source;
+    if (traceFinding) traceFinding.textContent = state.traceFinding;
+    if (finding) finding.textContent = state.finding;
+    if (planTitle) planTitle.textContent = state.planTitle;
+    if (planDetail) planDetail.textContent = state.planDetail;
+
+    root.dataset.activeSystem = key;
+    animateRefresh();
+
+    if (announce && announcer) {
+      announcer.textContent = `${state.label}: ${state.company}. ${state.traceFinding}`;
+    }
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => render(tab.dataset.consoleSystem));
+    tab.addEventListener('keydown', (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      let next = index;
+      if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = tabs.length - 1;
+      tabs[next].focus();
+      render(tabs[next].dataset.consoleSystem);
+    });
+  });
+
+  if (action && plan) {
+    action.addEventListener('click', () => {
+      const opening = plan.hidden;
+      plan.hidden = !opening;
+      action.setAttribute('aria-expanded', opening ? 'true' : 'false');
+      action.firstChild.textContent = opening ? 'Close action plan ' : 'Open action plan ';
+      if (opening && !reduceMotion) {
+        plan.animate(
+          [{opacity:0,transform:'translateY(-4px)'},{opacity:1,transform:'translateY(0)'}],
+          {duration:220,easing:'cubic-bezier(.2,.7,.2,1)'}
+        );
+      }
+    });
+  }
+
+  render('chatgpt', false);
+})();
