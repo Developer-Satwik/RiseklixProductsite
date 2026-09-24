@@ -1,0 +1,15 @@
+Riseklix strategic content update — 2026-09-24
+
+Added three product-aligned resource guides without changing existing resource URLs:
+1. /resources/best-ai-visibility-tools-2026/
+2. /resources/ai-visibility-score-mentions-citations-recommendations/
+3. /resources/how-to-get-recommended-by-chatgpt/
+
+Also updated:
+- /resources/ featured section
+- sitemap.xml
+- sitemap.html and /sitemap/
+- llms.txt
+- cross-links and product CTAs
+
+Existing content URLs were preserved. No app/backend changes are included.

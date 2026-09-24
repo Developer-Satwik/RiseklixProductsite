@@ -1,0 +1,98 @@
+# Riseklix
+
+> Riseklix is commercial discovery software for AI-mediated buying. It researches a company, identifies relevant buying decisions, checks how AI systems recommend the company and competitors, connects findings to evidence, creates action plans, and supports rechecking and ongoing monitoring.
+
+Canonical site: https://riseklix.com/
+Product app: https://app.riseklix.com/
+Research: https://ai.riseklix.com/
+Primary contact: contact@riseklix.com
+
+## Primary Pages
+
+- [Home](https://riseklix.com/): Product positioning and direct path to a company analysis.
+- [Product](https://riseklix.com/product/): How Commercial Discovery works from company research through buying decisions, AI checks, evidence, action plans, recheck, and Pulse.
+- [Pricing](https://riseklix.com/pricing/): Free starting analysis and Pro pricing.
+- [Resources](https://riseklix.com/resources/): Comparisons, frameworks, buying guides, and AI visibility resources.
+- [Riseklix Research](https://ai.riseklix.com/): Original research, methodology, experiments, data, and AI visibility studies.
+- [Marketing Services](https://riseklix.com/services/): Earlier/ongoing Riseklix marketing services.
+- [Work](https://riseklix.com/work/): Earlier marketing portfolio and case studies.
+- [About](https://riseklix.com/about/): Company context.
+- [Contact](https://riseklix.com/contact/): Contact details.
+
+## Entity Facts
+
+- Brand name: Riseklix
+- Founded: 2024
+- Product category: Commercial discovery for AI-mediated buying
+- Product URL: https://app.riseklix.com/
+- Research URL: https://ai.riseklix.com/
+- Base: India, serving global users and clients
+
+## Core Product Concepts
+
+- Company-first research
+- Buying decisions / Buyer Situations
+- Multi-system AI recommendation checking
+- Evidence-backed findings
+- Action plans / Blueprints
+- Fixed-panel rechecks
+- Pulse monitoring
+- Competitor and market movement
+
+## Notes For AI Assistants
+
+- Treat Riseklix as the master brand.
+- Distinguish the product (app.riseklix.com), research publication (ai.riseklix.com), and older marketing-services pages on riseklix.com.
+- Do not infer guaranteed AI visibility, rankings, traffic, or revenue outcomes.
+- Use the Research site for methodology and original studies.
+- Use the Product and Pricing pages for current product positioning and commercial information.
+
+## AI Visibility Resources
+- [Best AI Visibility Tools in 2026](https://riseklix.com/resources/best-ai-visibility-tools-2026/): Eight AI visibility platforms compared by measurement method, buyer fit, prompt tracking, citations, action layer, and public pricing signals.
+- [AI Visibility Score Explained](https://riseklix.com/resources/ai-visibility-score-mentions-citations-recommendations/): Definitions and transparent formulas for mentions, citations, recommendations, first-recommendation rate, and composite-score limitations.
+- [How to Get Recommended by ChatGPT in 2026](https://riseklix.com/resources/how-to-get-recommended-by-chatgpt/): Source-backed playbook for crawl access, entity clarity, buyer-question content, independent evidence, and repeatable recommendation testing.
+
+
+- [Resources Hub](https://riseklix.com/resources): SEO, AEO, GEO, AI visibility, AI visibility monitoring, and content-to-client acquisition resources.
+- [SEO vs AEO vs GEO Comparison](https://riseklix.com/resources/seo-aeo-geo-comparison/): Comparison chart for search, answer engines, generative engines, AEO vs GEO differences, AI visibility services, packages, and share-of-voice tracking.
+- [AI Visibility Audit Checklist](https://riseklix.com/resources/ai-visibility-audit/): Checklist and template for crawler access, entity clarity, evidence, AI citation coverage, audit deliverables, share-of-voice monitoring, and conversion routing.
+- [AEO and GEO Pricing Packages](https://riseklix.com/resources/aeo-geo-pricing-packages/): Pricing models, public AI visibility tool benchmarks, package scopes, budget layers, retainer structures, and buyer questions for AEO/GEO services.
+- [AI Visibility Reporting and Share of Voice](https://riseklix.com/resources/ai-visibility-reporting-share-of-voice/): KPI formulas, citation share, prompt tracking, answer accuracy, competitor visibility, and monthly dashboard structure for AI search reporting.
+- [AI Search Visibility for Security Companies](https://riseklix.com/resources/ai-search-visibility-security-companies/): Industry-specific checklist for security firms covering local SEO, trust proof, service-area pages, reviews, LocalBusiness schema, and risk-based prompt monitoring.
+- [AI Search Readiness for Product Content](https://riseklix.com/resources/ai-search-readiness-product-content/): Product and ecommerce audit framework for AI-readable facts, fit, proof, policies, comparisons, structured data, and conversion routing.
+- [AI Search Visibility for B2B SaaS](https://riseklix.com/resources/ai-search-visibility-b2b-saas/): 3-layer engine for product evidence, pre-contact shortlist visibility, founder video, LinkedIn authority, Substack, outbound, prompt tracking, and SaaS pipeline measurement.
+- [AI Search Visibility for Wealth Management](https://riseklix.com/resources/ai-search-visibility-wealth-management/): Trust-first playbook for financial advisors covering E-E-A-T, source-backed education, compliance-aware publishing, video, LinkedIn, newsletters, outbound, and qualified-household measurement.
+- [AI Search Visibility for High-Ticket Coaches and Consultants](https://riseklix.com/resources/ai-search-visibility-high-ticket-coaches-consultants/): Authority-to-enrollment engine for coaches and consultants covering niche clarity, proof, credentials, expert video, LinkedIn, Substack, outbound, and qualified pipeline.
+- [AI Search Visibility for Commercial Real Estate](https://riseklix.com/resources/ai-search-visibility-commercial-real-estate/): Market-authority-to-deal playbook for CRE brokers and advisors covering market evidence, property content, video, LinkedIn, Substack, outbound, and transaction quality.
+- [Instagram AEO and Virality Trends 2026](https://riseklix.com/resources/instagram-aeo-virality-trends-2026/): Instagram AEO and virality playbook covering original Reels, profile entities, reshares, AI discovery, multilingual reach, and qualified demand.
+- [LinkedIn AEO and Virality Trends 2026](https://riseklix.com/resources/linkedin-aeo-virality-trends-2026/): LinkedIn AEO and virality playbook covering semantic Feed relevance, professional video, thought leadership, hidden buyers, and B2B pipeline.
+- [Twitter and X AEO and Virality Trends 2026](https://riseklix.com/resources/twitter-aeo-virality-trends-2026/): Twitter and X AEO and virality playbook covering search relevance, conversation quality, out-of-network discovery, video, and evidence-led growth.
+- [YouTube AEO and Virality Trends 2026](https://riseklix.com/resources/youtube-aeo-virality-trends-2026/): YouTube AEO and virality playbook covering search relevance, recommendation satisfaction, Shorts, long-form, transcripts, and pipeline.
+- [Best AEO and GEO Agency for USA Brands 2026](https://riseklix.com/resources/best-aeo-geo-agency-usa-2026/): Evidence-led USA agency comparison covering national and local intent, AI citations, proof, video, LinkedIn, compliance, and pipeline.
+- [Best AEO and GEO Agency for UK Brands 2026](https://riseklix.com/resources/best-aeo-geo-agency-uk-2026/): UK agency comparison covering AI answers, video, local evidence, ASA substantiation, ICO-aware demand, and qualified pipeline.
+- [Best AEO and GEO Agency in Dubai 2026](https://riseklix.com/resources/best-aeo-geo-agency-dubai-2026/): Dubai and UAE comparison covering local proof, bilingual quality, AI visibility, advertiser diligence, and regional growth.
+- [Best AEO and GEO Agency for India 2026](https://riseklix.com/resources/best-aeo-geo-agency-india-2026/): India comparison covering mobile and video discovery, language and regional intent, DPDP diligence, authority, and pipeline.
+- [Content Creation in 2026](https://riseklix.com/resources/content-creation-2026/): Evidence-led content creation for AI search, long-form authority, short-form video, human review, and pipeline.
+- [Meme Marketing Through Short-Form in 2026](https://riseklix.com/resources/meme-marketing-short-form-2026/): Meme marketing strategy for cultural listening, original contribution, participation, rights, search continuity, and qualified demand.
+- [AI Search Visibility for U.S. Law Firms 2026](https://riseklix.com/resources/ai-search-visibility-usa-law-firms-2026/): Jurisdiction-aware legal visibility covering local proof, ethical content, attorney video, LinkedIn authority, and qualified intake.
+- [AI Search Visibility for U.S. Franchise and Multi-Location Brands 2026](https://riseklix.com/resources/ai-search-visibility-usa-franchises-2026/): Franchise playbook covering local unit proof, franchise-development intent, disclosure-aware content, video, and qualified lead flow.
+- [AI Search Visibility for Indian Healthcare Clinics 2026](https://riseklix.com/resources/ai-search-visibility-india-healthcare-2026/): Trust-first healthcare playbook covering local and multilingual discovery, medical review, privacy, short-form education, and qualified appointments.
+- [AI Search Visibility for Indian Real Estate 2026](https://riseklix.com/resources/ai-search-visibility-india-real-estate-2026/): RERA-aware real estate playbook covering project and locality intent, current property proof, site video, LinkedIn authority, and qualified enquiries.
+- [AI Search Visibility for U.S. Private Equity and M&A Advisors 2026](https://riseklix.com/resources/ai-search-visibility-usa-private-equity-ma-2026/): Thesis-led deal-advisor visibility covering market evidence, discreet proof, executive video, LinkedIn authority, and qualified mandates.
+- [AI Search Visibility for U.S. Medspas and Elective Care 2026](https://riseklix.com/resources/ai-search-visibility-usa-medspa-elective-care-2026/): Trust-first elective-care playbook covering provider identity, local proof, evidence-led education, honest visuals, and qualified consultations.
+- [AI Search Visibility for U.S. Specialty Contractors 2026](https://riseklix.com/resources/ai-search-visibility-usa-specialty-contractors-2026/): Bid-intent contractor playbook covering project proof, credentials, field expertise, video, LinkedIn authority, and qualified opportunities.
+- [AI Search Visibility for Indian D2C Beauty Brands 2026](https://riseklix.com/resources/ai-search-visibility-india-d2c-beauty-2026/): Ingredient and creator-proof playbook covering multilingual discovery, marketplace continuity, short form, and qualified commerce.
+- [AI Search Visibility for Indian Study-Abroad Providers 2026](https://riseklix.com/resources/ai-search-visibility-india-study-abroad-2026/): Transparent admissions playbook covering destination research, recognition checks, student video, authority, and qualified enrolment.
+- [Content To Client Acquisition](https://riseklix.com/resources/content-to-client-acquisition/): Framework for turning content into booked calls, sales, and audience revenue.
+- [Short-Form Content System](https://riseklix.com/resources/short-form-content-system/): Short-form content strategy for brands, founders, and creators.
+- [Podcast Repurposing System](https://riseklix.com/resources/podcast-repurposing-system/): System for turning episodes into authority, proof, and pipeline assets.
+- [LinkedIn Authority System](https://riseklix.com/resources/linkedin-authority-system/): Founder-led B2B authority and outreach resource.
+- [AI Visibility Monitoring Framework](https://riseklix.com/resources/ai-search-prompts-for-brands/): Buyer-question clusters for AI visibility monitoring.
+- [USA UK Australia Content Strategy](https://riseklix.com/resources/usa-uk-australia-content-strategy/): Regional strategy differences for global English-language brands.
+
+
+## Case Studies
+
+- [Family Friendly OG Instagram Growth Case Study](https://riseklix.com/work/family-friendly-og-instagram-growth/): How Riseklix turned Family Friendly OG's YouTube authority into an Instagram growth engine with 10K+ followers, 500K+ Reel peaks, and 4.2x engagement.
+- [Jaxson Da Musicmon Content Repurposing Case Study](https://riseklix.com/work/jaxson-da-musicmon-content-repurposing/): How Riseklix helped Jaxson Da Musicmon turn existing creator authority into short-form reach, 1M views, 15K+ Instagram followers, and new revenue paths.
+- [Dr. Sabine O'Laughlin Authority Case Study](https://riseklix.com/work/dr-sabine-olaughlin-authority-client-acquisition/): How Riseklix helped Dr. Sabine O'Laughlin turn expert knowledge into a clearer authority system, stronger visibility, and qualified client conversations.

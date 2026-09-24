@@ -1,0 +1,70 @@
+Riseklix v42 — Platformer Game Update
+
+Updates in this build:
+- Replaced the Signal Run button/collector game with a Mario-inspired but fully original pixel platformer: Riseklix Run.
+- Added a cute blue Riseklix-inspired pixel mascot drawn directly in canvas.
+- Added power-ups: Hook Coin, Proof Shield, Matcha Boost, Money Pixel, Podcast Mic, Reply Magnet, Ad Spark, and Offer Key.
+- Added enemies: Dislike Monster, Vanity Slime, Skip Ghost, Algo Bat, and Dead Lead.
+- Added a Booked Call portal win state that unlocks the “Book the revenue map” CTA.
+- Added desktop controls: arrows / A-D + space.
+- Added mobile controls: left, jump, right buttons.
+- Kept the game lightweight using HTML canvas + requestAnimationFrame.
+- Preserved Google tags, conversion tracking, firefly behavior, contact page improvements, and production files.
+
+Deploy by dragging this ZIP or the extracted folder into Netlify.
+
+v43 update:
+- Fixed mobile Riseklix Run start/win overlays being clipped by the GameBoy canvas.
+- Added compact mobile-only typography, safer line-height, and responsive canvas height.
+- Kept desktop platformer behavior unchanged.
+
+
+v50 update:
+- Kept v44/v49 base and changed the Studio Doctrine pixel-logo rain timing.
+- First one/two pixels now drop slowly, then the rest accelerate into the logo.
+- Extended reveal completion timing so the animation reads clearly without adding layout-heavy effects.
+
+v52 deployment note:
+- Set BEEHIIV_API_KEY in Netlify environment variables before deploying.
+- BEEHIIV_PUBLICATION_ID is prefilled in the function fallback as pub_babdd085-ee58-43a5-9841-fd11b4cb743a, but setting it in Netlify is recommended.
+- Do not paste the beehiiv API key into frontend JavaScript or committed HTML.
+
+
+V52 HOTFIX — DEPLOYMENT ROOT
+- Repacked ZIP with index.html at the archive root.
+- Previous v51 ZIP contained an outer project folder, which can make drag/drop/manual deploys open to 404 or a blank root if the platform uses the archive root as the publish directory.
+- For Netlify drag-and-drop, unzip first and drag the folder that directly contains index.html, or upload this v52 root ZIP if your deploy flow accepts ZIPs.
+- Beehiiv API key must be set as Netlify environment variable BEEHIIV_API_KEY; do not paste it into frontend JS.
+
+v55 SEO / AEO / GEO foundation update:
+- Added visible direct-answer sections to core pages.
+- Expanded page-level JSON-LD graphs and service/entity metadata.
+- Added sitemap lastmod values, social preview metadata, robots directives, image dimensions, clean .html-to-slash redirects, and llms.txt.
+- FAQ markup is kept only where matching Q&A content is visible; do not expect Google FAQ rich-result dropdowns, since Google removed that feature in 2026.
+
+## v56 SEO/AEO/GEO resource layer - 2026-07-02
+
+- Published a low-clutter /resources/ library with comparison charts, AI visibility audit, prompt monitoring, content-to-client acquisition, short-form, podcast, LinkedIn, and USA/UK/Australia strategy pages.
+- Added Article and CollectionPage JSON-LD on resource pages with canonical URLs, breadcrumbs, and updated sitemap entries.
+- Added footer, sitemap, llms.txt, Netlify redirects, and homepage research-desk links so the pages are discoverable without complicating the primary navigation.
+
+## v57 production case-study layer - 2026-07-03
+
+- Added dedicated crawlable case-study pages for Family Friendly OG, Jaxson Da Musicmon, and Dr. Sabine O'Laughlin.
+- Linked case studies from Work, Sitemap, sitemap.xml, Netlify redirects, and llms.txt.
+- Reworked the public AI visibility monitoring resource to remove raw internal prompt-bank language and present a buyer-ready monitoring framework.
+- Added case-study CSS for metrics, snapshots, strategy tables, proof sections, and related systems.
+
+
+## v58 Category Authority Engine services update - 2026-07-03
+
+- Repositioned the Services page around the Riseklix Category Authority Engine.
+- Added a three-layer services section covering Intent Layer AEO/GEO, Cinematic Visual Authority, and Precision Outbound.
+- Updated services metadata, FAQ copy, JSON-LD service schema, and llms.txt with ICP mapping, targeted lead lists, and revenue-driving social strategy.
+
+
+## v59 Ahrefs audit cleanup - 2026-07-03
+
+- Normalized top-level canonical and sitemap URLs to the live slashless 200 URLs used by Netlify.
+- Updated top-level .html and trailing-slash redirects to point directly at slashless canonical URLs.
+- Fixed one internal redirecting Services CTA, normalized the AI ChatGPT Ads link, added home-page image alt text, and added two additional internal resource links from Services.
