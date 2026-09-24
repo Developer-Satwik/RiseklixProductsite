@@ -4,7 +4,19 @@ A static, deployment-ready site for Riseklix Media / Riseklix Agency.
 
 ## Deploy
 
-Upload the full folder to Netlify, Vercel, Cloudflare Pages, or any static host. `netlify.toml`, `robots.txt`, `sitemap.xml`, `404.html`, legal pages, and responsive CSS are included.
+Production source of truth is the `main` branch of `Developer-Satwik/RiseklixProductsite`.
+
+Recommended Netlify configuration:
+- Repository: `Developer-Satwik/RiseklixProductsite`
+- Production branch: `main`
+- Base directory: repository root
+- Build command: none
+- Publish directory: `.`
+- Functions directory: `netlify/functions` (already declared in `netlify.toml`)
+
+Do not deploy production from a locally generated ZIP. Manual ZIP deployment can leave `riseklix.com` serving an older snapshot while GitHub contains newer canonical pages, schema, redirects, sitemap changes, and research.
+
+After the Git connection is active, verify the live homepage, `/about/`, `/product/`, `/pricing/`, `/resources/`, `/robots.txt`, and `/sitemap.xml` before submitting changed URLs for recrawling.
 
 ## Calendly
 
