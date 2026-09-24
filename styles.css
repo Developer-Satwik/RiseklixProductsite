@@ -4767,3 +4767,33 @@ body{
   .story-screen-panel,.story-progress-fill,.story-progress i,.story-step{transition:none!important;animation:none!important}
   .story-step.is-active{transform:none}
 }
+
+/* --- v20260924 sticky story runway fix --- */
+/*
+  Sticky needs a containing block taller than the sticky element itself.
+  The story grid previously used align-items:start, which kept the left
+  wrapper at the instrument's own height and removed the sticky runway.
+*/
+@media(min-width:1001px){
+  .discovery-story{overflow:visible}
+  .story-grid{align-items:stretch}
+  .story-stage-wrap{
+    align-self:stretch;
+    position:relative;
+    min-height:100%;
+  }
+  .story-stage{
+    position:sticky;
+    top:96px;
+    height:min(650px,calc(100vh - 120px));
+    min-height:560px;
+    max-height:650px;
+  }
+  .story-screen{
+    min-height:calc(100% - 76px);
+    height:calc(100% - 76px);
+  }
+  .story-screen-panel{
+    min-height:100%;
+  }
+}
