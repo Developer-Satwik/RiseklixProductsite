@@ -4998,3 +4998,94 @@ body{
   .btn:hover::before,.btn:focus-visible::before{transform:translate3d(-8px,0,0)}
   .btn:hover .btn-label,.btn:focus-visible .btn-label{transform:none}
 }
+
+
+/* --- v20260924 button palette correction --- */
+/*
+  Interaction must never change a button's semantic color role.
+  Keep the block-world motion, preserve the resting palette.
+*/
+.nav-signin,
+.nav-signin:link,
+.nav-signin:visited,
+.nav-signin:active{
+  color:#ddd9e9!important;
+  background:transparent!important;
+}
+.nav-signin:hover,
+.nav-signin:focus-visible{
+  color:var(--acid)!important;
+  background:transparent!important;
+}
+
+/* Resting colors are explicit and stable. */
+.btn.primary,
+a.btn.primary,
+button.btn.primary{
+  background:var(--acid)!important;
+  color:#050509!important;
+  border-color:transparent!important;
+}
+.btn.bluebtn,
+a.btn.bluebtn,
+button.btn.bluebtn{
+  background:var(--blue)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+}
+.btn.ghost,
+a.btn.ghost,
+button.btn.ghost{
+  background:rgba(255,255,255,.07)!important;
+  color:var(--paper)!important;
+  border-color:var(--line)!important;
+}
+.btn.outline,
+a.btn.outline,
+button.btn.outline{
+  background:transparent!important;
+  color:var(--ink)!important;
+  border-color:rgba(5,5,9,.22)!important;
+}
+
+/* Context-specific secondary button on light resource/product surfaces. */
+.resource-product-inner .btn.ghost,
+.paper .btn.ghost{
+  background:rgba(5,5,9,.04)!important;
+  color:var(--ink)!important;
+  border-color:rgba(5,5,9,.18)!important;
+}
+
+/* The cover is now a tint, never a palette inversion. */
+.btn.primary{--btn-cover:rgba(255,255,255,.24)}
+.btn.bluebtn{--btn-cover:rgba(255,255,255,.16)}
+.btn.ghost{--btn-cover:rgba(255,255,255,.09)}
+.btn.outline{--btn-cover:rgba(5,5,9,.07)}
+.paper .btn.ghost{--btn-cover:rgba(33,76,255,.08)}
+.paper .btn.outline{--btn-cover:rgba(33,76,255,.07)}
+
+/* Text and signal always keep the button's semantic foreground color. */
+.btn .btn-label,
+.btn .btn-signal,
+.btn:hover .btn-label,
+.btn:focus-visible .btn-label,
+.btn:active .btn-label,
+.btn:hover .btn-signal,
+.btn:focus-visible .btn-signal,
+.btn:active .btn-signal{
+  color:inherit!important;
+}
+
+/* Keep the stepped cover below the foreground without painting over the base color. */
+.btn::before{
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+}
+.btn.primary:hover,
+.btn.primary:focus-visible{
+  box-shadow:0 18px 42px rgba(199,255,45,.22)!important;
+}
+.btn.bluebtn:hover,
+.btn.bluebtn:focus-visible{
+  box-shadow:0 18px 42px rgba(33,76,255,.24)!important;
+}
