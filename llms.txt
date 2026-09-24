@@ -110,3 +110,8 @@ Primary contact: contact@riseklix.com
 
 - [Satwik Kumar](https://riseklix.com/authors/satwik-kumar/): Founder of Riseklix and research lead for the flagship AI search measurement and Commercial Discovery reference guides on riseklix.com.
 - Riseklix Research author background and field-note archive: https://ai.riseklix.com/about
+
+
+## Riseklix Observatory
+
+- [Riseklix Observatory](https://riseklix.com/observatory/): Dated index of original research and public-source reviews. Current instruments include the India AI Visibility Index 2026, India SaaS Buyer-Evidence Review, and India AEO Agency Source Review. Preserve each study's collection date, sample, method, and limitations when quoting a result.
