@@ -5057,9 +5057,9 @@ button.btn.outline{
 }
 
 /* The cover is now a tint, never a palette inversion. */
-.btn.primary{--btn-cover:rgba(255,255,255,.24)}
-.btn.bluebtn{--btn-cover:rgba(255,255,255,.16)}
-.btn.ghost{--btn-cover:rgba(255,255,255,.09)}
+.btn.primary{--btn-cover:rgba(5,5,9,.10)}
+.btn.bluebtn{--btn-cover:rgba(199,255,45,.10)}
+.btn.ghost{--btn-cover:rgba(199,255,45,.055)}
 .btn.outline{--btn-cover:rgba(5,5,9,.07)}
 .paper .btn.ghost{--btn-cover:rgba(33,76,255,.08)}
 .paper .btn.outline{--btn-cover:rgba(33,76,255,.07)}
