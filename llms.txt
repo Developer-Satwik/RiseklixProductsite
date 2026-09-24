@@ -104,3 +104,9 @@ Primary contact: contact@riseklix.com
 - [AI Search Volatility 2026: Why Recommendations Change and How to Measure Movement](https://riseklix.com/resources/ai-search-volatility-recheck-monitoring-2026/): A comprehensive guide to AI recommendation and citation volatility: stochastic answer changes, retrieval drift, model updates, persistence metrics, recheck design, monitoring cadence, and how to separate noise from meaningful movement.
 - [The AI Search Funnel 2026: Crawl → Retrieve → Cite → Mention → Recommend → Convert](https://riseklix.com/resources/ai-search-funnel-retrieval-citation-recommendation-conversion/): A comprehensive AI search funnel for diagnosing visibility from crawl eligibility through retrieval, citations, brand mentions, recommendations, referral clicks and conversions, with formulas and failure patterns.
 - [How to Choose AI Search Prompts in 2026: A Buyer-Decision Framework](https://riseklix.com/resources/how-to-choose-ai-search-prompts-buyer-decision-framework/): A comprehensive framework for choosing AI search prompts that represent real buying decisions: unaided vs aided prompts, buyer constraints, competitor alternatives, prompt families, priority scoring, panel freezing and monitoring.
+
+
+## Author and research responsibility
+
+- [Satwik Kumar](https://riseklix.com/authors/satwik-kumar/): Founder of Riseklix and research lead for the flagship AI search measurement and Commercial Discovery reference guides on riseklix.com.
+- Riseklix Research author background and field-note archive: https://ai.riseklix.com/about

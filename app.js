@@ -2584,3 +2584,24 @@ if ('IntersectionObserver' in window) {
 })();
 // --- v20260924 Product Decision Atlas ---
 (()=>{const root=document.querySelector('[data-product-atlas]');if(!root)return;const buttons=[...root.querySelectorAll('[data-atlas-step]')],k=root.querySelector('[data-atlas-kicker]'),t=root.querySelector('[data-atlas-title]'),c=root.querySelector('[data-atlas-copy]'),core=root.querySelector('.atlas-core');const stages=[['01 / COMPANY','Understand the business first.','Offer, buyers, geography, constraints, and public evidence become the context for everything that follows.'],['02 / BUYING DECISION','Model the commercial choice.','Turn business context into a decision where a real buyer could reasonably compare your company with alternatives.'],['03 / AI CHECKS','Keep disagreement visible.','Run the approved question across supported AI systems without blending different answers into one synthetic result.'],['04 / EVIDENCE','Trace the result backward.','Connect the answer to citations, competitors, public proof, and a supported finding you can inspect.'],['05 / ACTION','Turn the gap into work.','Create an implementation path for the site, content, positioning, proof, or other change the evidence supports.'],['06 / RECHECK','Run the same decision again.','Use the approved baseline panel after implementation and keep ongoing Pulse monitoring as a separate job.']];function set(i){const s=stages[i]||stages[0];k.textContent=s[0];t.textContent=s[1];c.textContent=s[2];buttons.forEach((b,n)=>{const a=n===i;b.classList.toggle('is-active',a);b.setAttribute('aria-selected',a?'true':'false');b.tabIndex=a?0:-1});if(core&&!matchMedia('(prefers-reduced-motion: reduce)').matches)core.animate([{opacity:.35,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'})}buttons.forEach((b,i)=>{b.addEventListener('click',()=>set(i));b.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();let n=i;if(e.key==='ArrowLeft')n=(i-1+buttons.length)%buttons.length;if(e.key==='ArrowRight')n=(i+1)%buttons.length;if(e.key==='Home')n=0;if(e.key==='End')n=buttons.length-1;buttons[n].focus();set(n)})});set(0)})();
+
+// --- v20260924 Riseklix citation copy controls ---
+(() => {
+  const buttons = document.querySelectorAll('[data-copy-citation]');
+  if (!buttons.length) return;
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return; }
+    const area = document.createElement('textarea');
+    area.value = text; area.setAttribute('readonly',''); area.style.position='fixed'; area.style.opacity='0';
+    document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+  }
+  buttons.forEach(button => button.addEventListener('click', async () => {
+    const box=button.closest('.research-citation-box');
+    const text=box?.querySelector('[data-citation-text]')?.textContent?.trim();
+    const status=box?.querySelector('[data-copy-status]');
+    if(!text) return;
+    try { await copyText(text); button.textContent='Copied'; if(status) status.textContent='Citation copied to clipboard.'; }
+    catch { button.textContent='Select citation'; if(status) status.textContent='Copy was blocked by the browser. Select the citation text above.'; }
+    window.setTimeout(()=>{button.textContent='Copy citation'; if(status) status.textContent='';},1800);
+  }));
+})();
