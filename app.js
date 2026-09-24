@@ -443,18 +443,6 @@ if ('IntersectionObserver' in window) {
       surface.style.setProperty('--my', `${event.clientY - rect.top}px`);
     }, { passive: true });
   });
-
-  document.querySelectorAll('.btn').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      const rect = button.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      ripple.className = 'btn-ripple';
-      ripple.style.left = `${event.clientX - rect.left}px`;
-      ripple.style.top = `${event.clientY - rect.top}px`;
-      button.appendChild(ripple);
-      window.setTimeout(() => ripple.remove(), 650);
-    });
-  });
 })();
 
 
@@ -2127,4 +2115,47 @@ if ('IntersectionObserver' in window) {
   }
   updateStage(0);
   if(!reduceMotion) requestAnimationFrame(frame);
+})();
+
+// --- v20260924 Riseklix signal buttons ---
+(() => {
+  const buttons = Array.from(document.querySelectorAll('.btn'));
+  const canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  buttons.forEach((button) => {
+    if (button.dataset.rkButtonReady === 'true') return;
+    button.dataset.rkButtonReady = 'true';
+
+    // Preserve all existing text/icons/markup while giving the motion layer one stable label.
+    const label = document.createElement('span');
+    label.className = 'btn-label';
+    while (button.firstChild) label.appendChild(button.firstChild);
+    button.appendChild(label);
+
+    // Strong CTAs get a tiny 3-block signal, echoing Discovery World without becoming decorative clutter.
+    if ((button.classList.contains('primary') || button.classList.contains('bluebtn')) && !button.closest('.newsletter')) {
+      const signal = document.createElement('span');
+      signal.className = 'btn-signal';
+      signal.setAttribute('aria-hidden', 'true');
+      signal.innerHTML = '<i></i><i></i><i></i>';
+      button.appendChild(signal);
+    }
+
+    if (!canHover || reduceMotion) return;
+
+    // Very small pointer bias: tactile, not "magnetic cursor" theatre.
+    button.addEventListener('pointermove', (event) => {
+      const rect = button.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - .5;
+      const y = (event.clientY - rect.top) / rect.height - .5;
+      button.style.setProperty('--btn-x', `${(x * 2.4).toFixed(2)}px`);
+      button.style.setProperty('--btn-y', `${(y * 1.6).toFixed(2)}px`);
+    }, {passive:true});
+
+    button.addEventListener('pointerleave', () => {
+      button.style.setProperty('--btn-x', '0px');
+      button.style.setProperty('--btn-y', '0px');
+    });
+  });
 })();

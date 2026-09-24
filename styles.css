@@ -4840,3 +4840,161 @@ body{
 @media(prefers-reduced-motion:reduce){
   .world-frame,.world-step{transition:none!important}
 }
+
+
+/* --- v20260924 Riseklix signal-button interaction system --- */
+/*
+  One interaction language for buttons:
+  stepped block-world cover -> contrast flip -> signal blocks -> short physical press.
+  Replaces the older lift + white sheen + ripple stack.
+*/
+.btn{
+  --btn-x:0px;
+  --btn-y:0px;
+  --btn-cover:#f5f0e8;
+  --btn-cover-text:#050509;
+  --btn-rest-text:currentColor;
+  isolation:isolate;
+  position:relative;
+  overflow:hidden;
+  transform:translate3d(var(--btn-x),var(--btn-y),0);
+  transition:
+    transform 180ms cubic-bezier(.2,.8,.2,1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+  will-change:transform;
+}
+.btn:hover{transform:translate3d(var(--btn-x),var(--btn-y),0)}
+.btn::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:-1px;
+  bottom:-1px;
+  left:-1px;
+  width:calc(100% + 20px);
+  background:var(--btn-cover);
+  transform:translate3d(calc(-100% - 4px),0,0);
+  clip-path:polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    calc(100% - 16px) 6px,
+    calc(100% - 10px) 6px,
+    calc(100% - 10px) 12px,
+    calc(100% - 4px) 12px,
+    calc(100% - 4px) 18px,
+    100% 18px,
+    100% 100%,
+    0 100%
+  );
+  transition:transform 195ms cubic-bezier(.16,1,.3,1);
+  pointer-events:none;
+}
+.btn:hover::before,
+.btn:focus-visible::before{
+  transform:translate3d(-8px,0,0);
+}
+.btn-label{
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.42em;
+  min-width:0;
+  color:inherit;
+  transform:translate3d(0,0,0);
+  transition:
+    color 125ms ease 45ms,
+    transform 190ms cubic-bezier(.16,1,.3,1);
+}
+.btn:hover .btn-label,
+.btn:focus-visible .btn-label{
+  color:var(--btn-cover-text);
+  transform:translate3d(1px,0,0);
+}
+.btn-signal{
+  position:relative;
+  z-index:2;
+  display:inline-grid;
+  grid-template-columns:repeat(3,4px);
+  gap:2px;
+  align-items:end;
+  width:16px;
+  flex:0 0 auto;
+  color:inherit;
+}
+.btn-signal i{
+  width:4px;
+  height:4px;
+  display:block;
+  background:currentColor;
+  opacity:.38;
+  transform:translateY(0) scaleY(.75);
+  transform-origin:50% 100%;
+  transition:
+    transform 170ms cubic-bezier(.16,1,.3,1),
+    opacity 120ms ease,
+    background-color 120ms ease;
+}
+.btn-signal i:nth-child(2){transition-delay:24ms}
+.btn-signal i:nth-child(3){transition-delay:48ms}
+.btn:hover .btn-signal,
+.btn:focus-visible .btn-signal{color:var(--btn-cover-text)}
+.btn:hover .btn-signal i,
+.btn:focus-visible .btn-signal i{
+  opacity:1;
+  transform:translateY(-2px) scaleY(1.55);
+}
+.btn:hover .btn-signal i:nth-child(2),
+.btn:focus-visible .btn-signal i:nth-child(2){transform:translateY(-4px) scaleY(2.05)}
+.btn:hover .btn-signal i:nth-child(3),
+.btn:focus-visible .btn-signal i:nth-child(3){transform:translateY(-1px) scaleY(1.25)}
+.btn:active{
+  transform:translate3d(var(--btn-x),calc(var(--btn-y) + 1px),0) scale(.982);
+  transition-duration:90ms;
+}
+.btn:active::before{transform:translate3d(-8px,0,0)}
+.btn:active .btn-label{transform:translate3d(2px,0,0)}
+.btn:focus-visible{
+  outline:2px solid var(--acid);
+  outline-offset:4px;
+}
+.primary{
+  --btn-cover:#050509;
+  --btn-cover-text:var(--acid);
+}
+.bluebtn{
+  --btn-cover:#050509;
+  --btn-cover-text:#fff;
+}
+.ghost{
+  --btn-cover:var(--paper);
+  --btn-cover-text:#050509;
+}
+.outline{
+  --btn-cover:#050509;
+  --btn-cover-text:var(--paper);
+}
+/* Paper-surface primary buttons keep the same acid -> ink interaction. */
+.paper .primary{--btn-cover:#050509;--btn-cover-text:var(--acid)}
+/* Retire the old generic effects. */
+.btn-ripple{display:none!important}
+.btn:hover:before{ /* override legacy diagonal sheen rule with the signal cover position */ transform:translate3d(-8px,0,0) }
+
+@media(hover:none),(pointer:coarse){
+  .btn{transform:none!important}
+  .btn:hover::before{transform:translate3d(calc(-100% - 4px),0,0)}
+  .btn:hover .btn-label{color:inherit;transform:none}
+  .btn:hover .btn-signal{color:inherit}
+  .btn:hover .btn-signal i{opacity:.38;transform:translateY(0) scaleY(.75)}
+  .btn:active::before{transform:translate3d(-8px,0,0)}
+  .btn:active .btn-label{color:var(--btn-cover-text)}
+  .btn:active .btn-signal{color:var(--btn-cover-text)}
+}
+@media(prefers-reduced-motion:reduce){
+  .btn,.btn::before,.btn-label,.btn-signal i{transition:none!important;animation:none!important}
+  .btn{transform:none!important}
+  .btn:hover::before,.btn:focus-visible::before{transform:translate3d(-8px,0,0)}
+  .btn:hover .btn-label,.btn:focus-visible .btn-label{transform:none}
+}
