@@ -5166,3 +5166,14 @@ button.btn.outline{
 .observatory-rule{display:grid;grid-template-columns:40px 1fr;gap:.7rem;padding:.9rem 0;border-top:1px solid var(--line)}.observatory-rule>span{font:900 .62rem/1 var(--mono);color:var(--violet)}.observatory-rule h3{margin:0 0 .25rem;font-size:1rem}.observatory-rule p{margin:0;color:var(--muted)}
 @media(max-width:900px){.observatory-home-grid,.observatory-grid{grid-template-columns:1fr}.observatory-home-signal{border-right:0;border-bottom:1px solid rgba(255,255,255,.1)}.observatory-home-signal:last-child{border-bottom:0}.observatory-signal-primary{grid-column:auto}.observatory-signal-primary .observatory-numbers{grid-template-columns:repeat(2,max-content)}}
 @media(max-width:620px){.observatory-home-head{align-items:start;flex-direction:column}.observatory-signal-top{flex-direction:column}.observatory-home:before{font-size:26vw}}
+
+/* --- v20260924 Riseklix Source Room system --- */
+.source-room-hero .display{max-width:13ch}.source-room-index{position:relative;overflow:hidden}.source-room-index:before{content:"SOURCE ROOM";position:absolute;right:-.05em;top:.1em;font:900 clamp(5rem,16vw,14rem)/.78 var(--display);letter-spacing:-.09em;color:rgba(255,255,255,.02);pointer-events:none}
+.source-room-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.source-room-card{min-width:0;border:1px solid rgba(255,255,255,.12);background:#0d0d14;border-radius:18px;padding:1rem;box-shadow:7px 8px 0 rgba(0,0,0,.22)}
+.source-room-card:nth-child(1){border-top:5px solid var(--acid)}.source-room-card:nth-child(2){border-top:5px solid var(--cyan)}.source-room-card:nth-child(3){border-top:5px solid var(--hot)}
+.source-room-meta{display:flex;justify-content:space-between;gap:.7rem;font:800 .44rem/1.35 var(--mono);letter-spacing:.06em;color:#76717f;text-transform:uppercase;margin-bottom:.8rem}.source-room-card h3{font-size:1.25rem;line-height:1.04;margin:0 0 .85rem}
+.source-room-sample{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-bottom:.9rem}.source-room-sample strong{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);border-radius:8px;padding:.48rem;font:800 .54rem/1.25 var(--mono);color:#e9e4ed}
+.source-room-card p{font-size:.7rem;line-height:1.55;color:#a49eac}.source-room-card p b{color:#f1edf4}.source-room-card code{display:block;margin:.85rem 0;padding:.7rem;background:#08080d;border:1px solid rgba(255,255,255,.08);border-radius:9px;white-space:normal;font:600 .54rem/1.5 var(--mono);color:#8f8998}
+.source-room-policy .section-head p,.source-room-disclosure .body-xl{max-width:66ch}.source-room-policy a,.source-room-disclosure a{color:inherit}
+@media(max-width:960px){.source-room-grid{grid-template-columns:1fr}.source-room-meta{flex-wrap:wrap}}

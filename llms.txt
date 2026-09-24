@@ -115,3 +115,9 @@ Primary contact: contact@riseklix.com
 ## Riseklix Observatory
 
 - [Riseklix Observatory](https://riseklix.com/observatory/): Dated index of original research and public-source reviews. Current instruments include the India AI Visibility Index 2026, India SaaS Buyer-Evidence Review, and India AEO Agency Source Review. Preserve each study's collection date, sample, method, and limitations when quoting a result.
+
+
+## Research Source Room
+
+- [Riseklix Research Source Room](https://riseklix.com/source-room/): Study metadata, safe citation scope, methods, limitations, correction policy, commercial-interest disclosure, and research contact for original Riseklix studies.
+- Research corrections and source questions: satwik@riseklix.com
