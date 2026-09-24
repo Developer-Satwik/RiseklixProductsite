@@ -1950,7 +1950,8 @@ if ('IntersectionObserver' in window) {
     {id:'proof',x:4,y:4,label:'PROOF'},
     {id:'fit',x:5,y:3,label:'FIT'}
   ];
-  const NOISE = new Set(['2,5','3,5','5,1','6,5','7,5']);
+  const NOISE = new Set(['2,5','3,5','5,1','7,5']);
+  const SOLID = new Set(['0,5','8,1','6,5','1,2','2,2','3,2','3,3']);
   const PATH = [[1,4],[2,4],[2,3],[3,3],[4,3],[4,4],[5,4],[6,4],[7,4],[7,3]];
 
   let playing = false;
@@ -2398,6 +2399,11 @@ if ('IntersectionObserver' in window) {
     if(NOISE.has(keyOf(nx,ny))) {
       showToast('NOISE BLOCK · TRY ANOTHER PATH','hot');
       announce('A noise block is in the way. Choose another path.');
+      return;
+    }
+    if(SOLID.has(keyOf(nx,ny))) {
+      showToast('BLOCKED · FIND ANOTHER PATH','violet');
+      announce('A world object blocks that tile. Choose another path.');
       return;
     }
 
