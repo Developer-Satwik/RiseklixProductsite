@@ -1900,33 +1900,40 @@ if ('IntersectionObserver' in window) {
   setState(active);
 })();
 
-// --- v20260924 Riseklix Discovery World ---
+// --- v20260924 Riseklix Discovery Run v2 ---
 (() => {
   const root = document.querySelector('[data-discovery-world]');
   if (!root) return;
+
   const canvas = root.querySelector('[data-world-canvas]');
   if (!canvas || !canvas.getContext) return;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  const frameEl = root.querySelector('[data-world-frame]');
+  const screenEl = root.querySelector('[data-world-screen]');
   const stageLabel = root.querySelector('[data-world-stage]');
   const stageCopy = root.querySelector('[data-world-copy]');
-  const controls = Array.from(root.querySelectorAll('[data-world-step]'));
+  const statusEl = root.querySelector('[data-world-status]');
+  const systemsEl = root.querySelector('[data-world-systems]');
+  const evidenceEl = root.querySelector('[data-world-evidence]');
+  const startOverlay = root.querySelector('[data-world-start]');
+  const completeOverlay = root.querySelector('[data-world-complete]');
+  const startBtn = root.querySelector('[data-world-start-btn]');
+  const restartBtns = Array.from(root.querySelectorAll('[data-world-restart], [data-world-restart-small]'));
+  const moveBtns = Array.from(root.querySelectorAll('[data-world-move]'));
+  const announcer = root.querySelector('[data-world-announcer]');
+  const toast = root.querySelector('[data-world-toast]');
+
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const W = canvas.width, H = canvas.height;
-  const TILE_W = 68, TILE_H = 34, CUBE_H = 34;
-  const ORIGIN_X = 375, ORIGIN_Y = 165;
-  let stage = 0;
-  let renderStage = 0;
-  let last = performance.now();
-  let phase = 0;
-
-  const stages = [
-    {label:'01 / START AT YOUR SITE',copy:'Research the business before testing the market.',pos:[0,4]},
-    {label:'02 / CROSS THE AI GATES',copy:'The same buying decision can produce different answers.',pos:[2,3]},
-    {label:'03 / COLLECT THE EVIDENCE',copy:'Trace answers back to sources, competitors, and proof.',pos:[4,3]},
-    {label:'04 / FORGE THE ACTION',copy:'Turn the clearest supported gap into something you can change.',pos:[5,5]},
-    {label:'05 / RECHECK THE PATH',copy:'Run the same decision again and see what moved.',pos:[7,3]}
-  ];
+  const W = canvas.width;
+  const H = canvas.height;
+  const TILE_W = 66;
+  const TILE_H = 33;
+  const CUBE_H = 31;
+  const ORIGIN_X = 377;
+  const ORIGIN_Y = 126;
+  const MOVE_MS = reduceMotion ? 0 : 150;
+  const FPS_INTERVAL = 1000 / 30;
 
   const palette = {
     top:'#17223e', left:'#0c1429', right:'#101b34',
@@ -1934,173 +1941,597 @@ if ('IntersectionObserver' in window) {
     paper:'#f5f0e8', blue:'#214cff', ink:'#050509', amber:'#ffb01f'
   };
 
+  const START = {x:1,y:4};
+  const AI_GATE = {x:2,y:3};
+  const FORGE = {x:6,y:4};
+  const RECHECK = {x:7,y:3};
+  const EVIDENCE = [
+    {id:'source',x:4,y:2,label:'SOURCE'},
+    {id:'proof',x:4,y:4,label:'PROOF'},
+    {id:'fit',x:5,y:3,label:'FIT'}
+  ];
+  const NOISE = new Set(['2,5','3,5','5,1','6,5','7,5']);
+  const PATH = [[1,4],[2,4],[2,3],[3,3],[4,3],[4,4],[5,4],[6,4],[7,4],[7,3]];
+
+  let playing = false;
+  let complete = false;
+  let aiChecked = false;
+  let actionForged = false;
+  let collected = new Set();
+  let particles = [];
+  let phase = 0;
+  let inView = true;
+  let rafId = 0;
+  let lastFrame = performance.now();
+  let gateFlashUntil = 0;
+  let forgeFlashUntil = 0;
+  let winFlashUntil = 0;
+  let toastTimer = 0;
+  let lastDir = 'right';
+
+  const player = {
+    gx: START.x, gy: START.y,
+    fromX: START.x, fromY: START.y,
+    toX: START.x, toY: START.y,
+    moveStart: 0, moving: false
+  };
+
   const iso = (gx, gy, z=0) => ({
     x: ORIGIN_X + (gx - gy) * TILE_W / 2,
     y: ORIGIN_Y + (gx + gy) * TILE_H / 2 - z * CUBE_H
   });
 
-  const poly = (pts, fill, stroke='rgba(255,255,255,.07)') => {
-    ctx.beginPath();
-    pts.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-    ctx.closePath();
-    ctx.fillStyle = fill; ctx.fill();
-    if (stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
-  };
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const keyOf = (x,y) => `${x},${y}`;
+  const same = (a,b) => a.x===b.x && a.y===b.y;
+  const evidenceCount = () => collected.size;
 
-  const cube = (gx,gy,z=0,h=1,top=palette.top,left=palette.left,right=palette.right) => {
+  function poly(points, fill, stroke='rgba(255,255,255,.06)') {
+    ctx.beginPath();
+    points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    ctx.fillStyle=fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle=stroke;
+      ctx.lineWidth=1;
+      ctx.stroke();
+    }
+  }
+
+  function cube(gx,gy,z=0,h=1,top=palette.top,left=palette.left,right=palette.right) {
     const p=iso(gx,gy,z), up=h*CUBE_H;
-    const T={x:p.x,y:p.y-up}, L={x:p.x-TILE_W/2,y:p.y-TILE_H/2}, R={x:p.x+TILE_W/2,y:p.y-TILE_H/2};
-    const BL={x:p.x-TILE_W/2,y:p.y-TILE_H/2+up}, BR={x:p.x+TILE_W/2,y:p.y-TILE_H/2+up};
+    const T={x:p.x,y:p.y-up};
+    const L={x:p.x-TILE_W/2,y:p.y-TILE_H/2};
+    const R={x:p.x+TILE_W/2,y:p.y-TILE_H/2};
+    const BL={x:p.x-TILE_W/2,y:p.y-TILE_H/2+up};
+    const BR={x:p.x+TILE_W/2,y:p.y-TILE_H/2+up};
     poly([{x:T.x,y:T.y},{x:L.x,y:L.y-up},{x:p.x,y:p.y-TILE_H-up},{x:R.x,y:R.y-up}],top);
     poly([{x:T.x,y:T.y},{x:L.x,y:L.y-up},{x:BL.x,y:BL.y},{x:p.x,y:p.y}],left);
     poly([{x:T.x,y:T.y},{x:R.x,y:R.y-up},{x:BR.x,y:BR.y},{x:p.x,y:p.y}],right);
-  };
+  }
 
-  const textPixel = (txt,x,y,size=12,color='#fff',align='center') => {
+  function tile(gx,gy,color,alpha=.22) {
+    const p=iso(gx,gy,1.02);
     ctx.save();
-    ctx.font = `800 ${size}px "IBM Plex Mono", monospace`;
-    ctx.textAlign=align;ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(0,0,0,.52)';ctx.fillText(txt,x+2,y+2);
-    ctx.fillStyle=color;ctx.fillText(txt,x,y);ctx.restore();
-  };
+    ctx.globalAlpha=alpha;
+    poly([{x:p.x,y:p.y-2},{x:p.x-TILE_W/2,y:p.y-TILE_H/2-2},{x:p.x,y:p.y-TILE_H-2},{x:p.x+TILE_W/2,y:p.y-TILE_H/2-2}],color,null);
+    ctx.restore();
+  }
 
-  const drawGround = () => {
-    for(let gy=0;gy<7;gy++){
-      for(let gx=0;gx<9;gx++){
-        const d=(gx+gy)%2;
-        cube(gx,gy,0,1,d?'#101a30':'#121e37',d?'#091224':'#0a1327',d?'#0b1730':'#0c1932');
-      }
-    }
-    // acid path through the world
-    [[0,4],[1,4],[2,3],[3,3],[4,3],[5,4],[5,5],[6,4],[7,3]].forEach(([x,y],i)=>{
-      const p=iso(x,y,1.02);
-      poly([{x:p.x,y:p.y-2},{x:p.x-TILE_W/2,y:p.y-TILE_H/2-2},{x:p.x,y:p.y-TILE_H-2},{x:p.x+TILE_W/2,y:p.y-TILE_H/2-2}],i<=stage*2?palette.acid:'rgba(199,255,45,.12)',null);
-    });
-  };
+  function textPixel(text,x,y,size=10,color='#fff',align='center') {
+    ctx.save();
+    ctx.font=`800 ${size}px "IBM Plex Mono", monospace`;
+    ctx.textAlign=align;
+    ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(0,0,0,.55)';
+    ctx.fillText(text,x+2,y+2);
+    ctx.fillStyle=color;
+    ctx.fillText(text,x,y);
+    ctx.restore();
+  }
 
-  const building = (gx,gy,h,color,label) => {
+  function building(gx,gy,h,color,label) {
     const left=color==='acid'?'#526d0b':color==='cyan'?'#0c5264':color==='violet'?'#3d246c':'#14266f';
     const right=color==='acid'?'#6d900e':color==='cyan'?'#116b82':color==='violet'?'#523090':'#1a3190';
     const top=color==='acid'?palette.acid:color==='cyan'?palette.cyan:color==='violet'?palette.violet:palette.blue;
     cube(gx,gy,1,h,top,left,right);
     const p=iso(gx,gy,1+h);
-    textPixel(label,p.x,p.y-18,9,top);
-  };
+    textPixel(label,p.x,p.y-16,8,top);
+  }
 
-  const beacon = (gx,gy,color,label,active=false) => {
-    cube(gx,gy,1,0.34,color,'#111827','#17213c');
-    const p=iso(gx,gy,1.34);
+  function beacon(gx,gy,color,label,active=false,intensity=1) {
+    cube(gx,gy,1,.28,color,'#111827','#17213c');
+    const p=iso(gx,gy,1.28);
+    const pulse=reduceMotion?1:(.82+.18*Math.sin(phase*5));
     ctx.save();
-    ctx.globalAlpha=active?(.72+.22*Math.sin(phase*4)):.28;
-    ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=active?26:8;
-    ctx.beginPath();ctx.arc(p.x,p.y-15,active?8:5,0,Math.PI*2);ctx.fill();ctx.restore();
-    textPixel(label,p.x,p.y-34,8,active?color:'#756f82');
-  };
+    ctx.globalAlpha=active ? .9*pulse*intensity : .24;
+    ctx.fillStyle=color;
+    ctx.shadowColor=color;
+    ctx.shadowBlur=active?14:4;
+    ctx.fillRect(p.x-5,p.y-22,10,10);
+    ctx.restore();
+    textPixel(label,p.x,p.y-38,7,active?color:'#6e6879');
+  }
 
-  const character = (gx,gy) => {
+  function drawNoise(gx,gy) {
+    const flicker=reduceMotion?1:(.78+.22*Math.sin(phase*8+gx));
+    cube(gx,gy,1,.42,palette.hot,'#62183d','#8f2055');
+    const p=iso(gx,gy,1.42);
+    ctx.save();
+    ctx.globalAlpha=.45*flicker;
+    ctx.fillStyle=palette.hot;
+    ctx.fillRect(p.x-13,p.y-25,26,3);
+    ctx.fillRect(p.x-8,p.y-31,16,2);
+    ctx.restore();
+    textPixel('NOISE',p.x,p.y-43,6,palette.hot);
+  }
+
+  function evidenceCrystal(item) {
+    if (collected.has(item.id)) return;
+    const active=aiChecked;
+    const p=iso(item.x,item.y,1.22);
+    const float=reduceMotion?0:Math.sin(phase*4+item.x)*4;
+    ctx.save();
+    ctx.translate(p.x,p.y-24+float);
+    ctx.globalAlpha=active?1:.28;
+    ctx.shadowColor=palette.cyan;
+    ctx.shadowBlur=active?18:3;
+    poly([{x:0,y:-17},{x:-9,y:-2},{x:-5,y:13},{x:6,y:13},{x:10,y:-2}],palette.cyan,null);
+    ctx.restore();
+    textPixel(item.label,p.x,p.y-53+float,7,active?palette.cyan:'#6c6678');
+  }
+
+  function actionForge(now) {
+    building(6,5,1.22,'violet','ACTION');
+    const unlocked=evidenceCount()===EVIDENCE.length;
+    const p=iso(FORGE.x,FORGE.y,1.08);
+    tile(FORGE.x,FORGE.y,unlocked?palette.hot:palette.violet,unlocked?.5:.18);
+    ctx.save();
+    ctx.globalAlpha=actionForged ? .95 : unlocked ? (reduceMotion?.8:.65+.25*Math.sin(phase*5)) : .2;
+    ctx.fillStyle=actionForged?palette.acid:palette.hot;
+    ctx.shadowColor=actionForged?palette.acid:palette.hot;
+    ctx.shadowBlur=unlocked?18:4;
+    ctx.fillRect(p.x-12,p.y-27,24,12);
+    ctx.restore();
+    textPixel(actionForged?'FORGED':unlocked?'FORGE READY':'LOCKED',p.x,p.y-46,7,actionForged?palette.acid:unlocked?palette.hot:'#6e6879');
+    if (now<forgeFlashUntil) tile(FORGE.x,FORGE.y,palette.hot,.85);
+  }
+
+  function recheckGate(now) {
+    const active=actionForged;
+    beacon(RECHECK.x,RECHECK.y,palette.acid,'RECHECK',active,1);
+    if (active) tile(RECHECK.x,RECHECK.y,palette.acid,now<winFlashUntil?.8:.38);
+  }
+
+  function spawnBurst(gx,gy,color,count=12) {
+    const p=iso(gx,gy,1.35);
+    for(let i=0;i<count;i++) {
+      const angle=(Math.PI*2*i)/count;
+      const speed=30+(i%4)*11;
+      particles.push({
+        x:p.x,y:p.y-22,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-18,
+        life:.42+(i%3)*.06,maxLife:.58,color,size:3+(i%2)*2
+      });
+    }
+  }
+
+  function updateParticles(dt) {
+    particles.forEach(p=>{
+      p.life-=dt;
+      p.x+=p.vx*dt;
+      p.y+=p.vy*dt;
+      p.vy+=38*dt;
+    });
+    particles=particles.filter(p=>p.life>0);
+  }
+
+  function drawParticles() {
+    particles.forEach(p=>{
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,p.life/p.maxLife);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(Math.round(p.x),Math.round(p.y),p.size,p.size);
+      ctx.restore();
+    });
+  }
+
+  function drawGround(now) {
+    for(let gy=0;gy<7;gy++) {
+      for(let gx=0;gx<9;gx++) {
+        const d=(gx+gy)%2;
+        cube(gx,gy,0,1,d?'#101a30':'#121e37',d?'#091224':'#0a1327',d?'#0b1730':'#0c1932');
+      }
+    }
+
+    PATH.forEach(([x,y],i)=>{
+      let progress=0;
+      if(aiChecked) progress=3;
+      if(evidenceCount()>0) progress=5;
+      if(evidenceCount()===3) progress=7;
+      if(actionForged) progress=9;
+      tile(x,y,palette.acid,i<=progress?.28:.075);
+    });
+
+    if(!aiChecked) tile(AI_GATE.x,AI_GATE.y,palette.acid,.46);
+    EVIDENCE.forEach(item=>{ if(!collected.has(item.id)) tile(item.x,item.y,palette.cyan,aiChecked?.18:.07); });
+    if(now<gateFlashUntil) tile(AI_GATE.x,AI_GATE.y,palette.acid,.86);
+  }
+
+  function drawCharacter(gx,gy,moving=false) {
     const p=iso(gx,gy,1.08);
-    const bob=reduceMotion?0:Math.sin(phase*5)*3;
+    const bob=reduceMotion?0:Math.sin(phase*(moving?13:5))*(moving?4:2);
+    const step=moving && !reduceMotion ? Math.sin(phase*18)*3 : 0;
     ctx.save();
     ctx.translate(Math.round(p.x),Math.round(p.y-38+bob));
-    // shadow
-    ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(-13,29,26,7);
-    // body
-    ctx.fillStyle=palette.blue;ctx.fillRect(-12,-2,24,28);
-    ctx.fillStyle='#132aaa';ctx.fillRect(-12,17,24,9);
-    // head
-    ctx.fillStyle=palette.paper;ctx.fillRect(-14,-23,28,22);
-    // hair/mark
-    ctx.fillStyle=palette.ink;ctx.fillRect(-14,-23,28,7);
-    ctx.fillStyle=palette.acid;ctx.fillRect(-9,-17,7,7);
-    ctx.fillStyle=palette.ink;ctx.fillRect(5,-13,4,4);
-    // legs
-    ctx.fillStyle=palette.paper;ctx.fillRect(-10,26,8,11);ctx.fillRect(3,26,8,11);
+    ctx.fillStyle='rgba(0,0,0,.34)';
+    ctx.fillRect(-13,31,26,6);
+    ctx.fillStyle=palette.blue;
+    ctx.fillRect(-12,-2,24,28);
+    ctx.fillStyle='#132aaa';
+    ctx.fillRect(-12,17,24,9);
+    ctx.fillStyle=palette.paper;
+    ctx.fillRect(-14,-23,28,22);
+    ctx.fillStyle=palette.ink;
+    ctx.fillRect(-14,-23,28,7);
+    ctx.fillStyle=palette.acid;
+    ctx.fillRect(lastDir==='left'?2:-9,-17,7,7);
+    ctx.fillStyle=palette.ink;
+    ctx.fillRect(lastDir==='left'?-9:5,-13,4,4);
+    ctx.fillStyle=palette.paper;
+    ctx.fillRect(-10,26+step,8,11);
+    ctx.fillRect(3,26-step,8,11);
     ctx.restore();
-  };
+  }
 
-  const evidenceCrystal = (active) => {
-    const p=iso(4,3,1.4);
-    ctx.save();ctx.translate(p.x,p.y-22);
-    ctx.globalAlpha=active?1:.35;
-    ctx.fillStyle=palette.cyan;ctx.shadowColor=palette.cyan;ctx.shadowBlur=active?24:6;
-    poly([{x:0,y:-19},{x:-11,y:-2},{x:-6,y:15},{x:7,y:15},{x:12,y:-2}],palette.cyan,null);
-    ctx.restore();
-    textPixel('EVIDENCE',p.x,p.y-56,8,active?palette.cyan:'#706b7c');
-  };
+  function draw(now=performance.now()) {
+    ctx.fillStyle='#050509';
+    ctx.fillRect(0,0,W,H);
 
-  const actionForge = (active) => {
-    building(5,5,1.2,'violet','ACTION');
-    const p=iso(5,5,2.25);
-    ctx.save();ctx.globalAlpha=active?(.7+.3*Math.sin(phase*5)):.15;ctx.fillStyle=palette.hot;ctx.shadowColor=palette.hot;ctx.shadowBlur=22;ctx.fillRect(p.x-10,p.y-18,20,12);ctx.restore();
-  };
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#081633');
+    g.addColorStop(.58,'#0c1021');
+    g.addColorStop(1,'#050509');
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,W,H);
 
-  const draw = () => {
-    ctx.clearRect(0,0,W,H);
-    // sky
-    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#081633');g.addColorStop(.58,'#0c1021');g.addColorStop(1,'#050509');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    // stars / pixels
-    ctx.fillStyle='rgba(255,255,255,.17)';
-    for(let i=0;i<42;i++){const x=(i*83)%W,y=(i*47)%240;ctx.fillRect(x,y,(i%3)+1,(i%3)+1);}
-    // distant block skyline
-    ctx.globalAlpha=.25;
-    for(let i=0;i<9;i++){const h=16+(i%4)*13;ctx.fillStyle=i%2?palette.violet:palette.blue;ctx.fillRect(i*95-30,115-h,54,h);}
+    ctx.fillStyle='rgba(255,255,255,.14)';
+    for(let i=0;i<34;i++) {
+      const x=(i*97)%W, y=(i*53)%180;
+      ctx.fillRect(x,y,(i%3)+1,(i%3)+1);
+    }
+
+    ctx.globalAlpha=.22;
+    for(let i=0;i<8;i++) {
+      const h=14+(i%4)*12;
+      ctx.fillStyle=i%2?palette.violet:palette.blue;
+      ctx.fillRect(i*104-20,105-h,48,h);
+    }
     ctx.globalAlpha=1;
 
-    drawGround();
-    building(0,4,1.45,'blue','YOUR SITE');
-    building(7,1,2.15,'violet','ALT');
-    beacon(2,2,palette.acid,'GPT',stage>=1);
-    beacon(2,3,palette.cyan,'GEM',stage>=1);
-    beacon(3,2,palette.violet,'CLD',stage>=1);
-    beacon(3,3,palette.hot,'PPLX',stage>=1);
-    evidenceCrystal(stage>=2);
-    actionForge(stage>=3);
-    beacon(7,3,palette.acid,'RECHECK',stage>=4);
+    drawGround(now);
+    building(0,5,1.45,'blue','YOUR SITE');
+    building(8,1,2.05,'violet','ALT');
 
-    const [tx,ty]=stages[stage].pos;
-    const [px,py]=stages[renderStage].pos;
-    character(px,py);
+    const gateElapsed=Math.max(0,gateFlashUntil-now);
+    const gateDone=aiChecked;
+    beacon(1,2,palette.acid,'GPT',gateDone || gateElapsed>360,1);
+    beacon(2,2,palette.cyan,'GEM',gateDone || gateElapsed>240,1);
+    beacon(3,2,palette.violet,'CLD',gateDone || gateElapsed>120,1);
+    beacon(3,3,palette.hot,'PPLX',gateDone || gateElapsed>0,1);
+    textPixel('AI GATE',iso(2,3,1.15).x,iso(2,3,1.15).y-36,7,gateDone?palette.acid:'#7a7486');
 
-    // tiny signposts
-    const cp=iso(7,1,3.25); textPixel('COMPETITOR',cp.x,cp.y-20,7,'#a49eaf');
-  };
-
-  function updateStage(next){
-    stage=(next+stages.length)%stages.length;
-    renderStage=stage;
-    if(stageLabel) stageLabel.textContent=stages[stage].label;
-    if(stageCopy) stageCopy.textContent=stages[stage].copy;
-    controls.forEach((b,i)=>b.classList.toggle('is-active',i===stage));
-    draw();
-  }
-
-  controls.forEach((btn,i)=>{
-    btn.addEventListener('click',()=>updateStage(i));
-    btn.addEventListener('keydown',(e)=>{
-      if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
-      e.preventDefault();
-      let n=i;
-      if(e.key==='ArrowLeft') n=(i-1+controls.length)%controls.length;
-      if(e.key==='ArrowRight') n=(i+1)%controls.length;
-      if(e.key==='Home') n=0;
-      if(e.key==='End') n=controls.length-1;
-      controls[n].focus();updateStage(n);
+    NOISE.forEach(k=>{
+      const [x,y]=k.split(',').map(Number);
+      drawNoise(x,y);
     });
-  });
-  canvas.tabIndex=0;
-  canvas.addEventListener('click',()=>updateStage(stage+1));
-  canvas.addEventListener('keydown',(e)=>{
-    if(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'){e.preventDefault();updateStage(stage+1);}
-    if(e.key==='ArrowLeft'){e.preventDefault();updateStage(stage-1);}
+
+    EVIDENCE.forEach(evidenceCrystal);
+    actionForge(now);
+    recheckGate(now);
+
+    let pgx=player.gx, pgy=player.gy;
+    if(player.moving && MOVE_MS>0) {
+      const t=Math.min(1,(now-player.moveStart)/MOVE_MS);
+      const e=easeOut(t);
+      pgx=player.fromX+(player.toX-player.fromX)*e;
+      pgy=player.fromY+(player.toY-player.fromY)*e;
+    }
+    drawCharacter(pgx,pgy,player.moving);
+    drawParticles();
+
+    const cp=iso(8,1,3.15);
+    textPixel('COMPETITOR',cp.x,cp.y-18,6,'#9b95a7');
+
+    if(complete && !reduceMotion) {
+      ctx.save();
+      ctx.globalAlpha=.18+.08*Math.sin(phase*5);
+      ctx.strokeStyle=palette.acid;
+      ctx.lineWidth=2;
+      ctx.strokeRect(7,7,W-14,H-14);
+      ctx.restore();
+    }
+  }
+
+  function announce(message) {
+    if(announcer) announcer.textContent=message;
+  }
+
+  function showToast(message,color='acid') {
+    if(!toast) return;
+    toast.textContent=message;
+    toast.style.color=palette[color]||palette.acid;
+    toast.style.borderColor=(palette[color]||palette.acid)+'66';
+    toast.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),900);
+  }
+
+  function updateHUD() {
+    if(systemsEl) systemsEl.textContent=aiChecked?'4/4':'0/4';
+    if(evidenceEl) evidenceEl.textContent=`${evidenceCount()}/3`;
+
+    let label='READY / DISCOVERY RUN';
+    let copy='Cross the AI gate, collect the evidence, forge an action, then recheck.';
+    let status='READY';
+
+    if(playing && !aiChecked) {
+      label='01 / CROSS THE AI GATE';
+      copy='Move onto the glowing AI GATE tile.';
+      status='RUNNING';
+    } else if(playing && evidenceCount()<3) {
+      label='02 / COLLECT EVIDENCE';
+      copy=`Collect the cyan evidence blocks. ${3-evidenceCount()} remaining.`;
+      status='EVIDENCE';
+    } else if(playing && !actionForged) {
+      label='03 / ACTION FORGE';
+      copy='Evidence complete. Move onto the pink Action Forge tile.';
+      status='FORGE READY';
+    } else if(playing && !complete) {
+      label='04 / RECHECK';
+      copy='Action forged. Reach the acid Recheck beacon.';
+      status='RECHECK';
+    } else if(complete) {
+      label='COMPLETE / DECISION TRAIL';
+      copy='The same path is ready to measure again.';
+      status='COMPLETE';
+    }
+
+    if(stageLabel) stageLabel.textContent=label;
+    if(stageCopy) stageCopy.textContent=copy;
+    if(statusEl) statusEl.textContent=status;
+  }
+
+  function handleTile(x,y) {
+    const now=performance.now();
+
+    if(x===AI_GATE.x && y===AI_GATE.y && !aiChecked) {
+      aiChecked=true;
+      gateFlashUntil=now+520;
+      spawnBurst(x,y,palette.acid,16);
+      showToast('4 AI SYSTEMS CHECKED','acid');
+      announce('AI checkpoint complete. Four systems checked. Collect three evidence blocks.');
+      updateHUD();
+      return;
+    }
+
+    const evidence=EVIDENCE.find(item=>item.x===x && item.y===y);
+    if(evidence && !collected.has(evidence.id)) {
+      if(!aiChecked) {
+        showToast('RUN AI CHECKS FIRST','hot');
+        announce('Evidence is locked until the AI checkpoint is completed.');
+        return;
+      }
+      collected.add(evidence.id);
+      spawnBurst(x,y,palette.cyan,14);
+      showToast(`EVIDENCE +1 · ${evidence.label}`,'cyan');
+      announce(`Evidence collected: ${evidence.label}. ${3-evidenceCount()} remaining.`);
+      if(evidenceCount()===3) {
+        showToast('ACTION FORGE UNLOCKED','hot');
+        announce('All evidence collected. The Action Forge is unlocked.');
+      }
+      updateHUD();
+      return;
+    }
+
+    if(x===FORGE.x && y===FORGE.y && !actionForged) {
+      if(evidenceCount()<3) {
+        showToast(`FORGE LOCKED · ${3-evidenceCount()} EVIDENCE LEFT`,'hot');
+        announce(`Action Forge locked. Collect ${3-evidenceCount()} more evidence blocks.`);
+        return;
+      }
+      actionForged=true;
+      forgeFlashUntil=now+650;
+      spawnBurst(x,y,palette.hot,18);
+      showToast('ACTION FORGED','hot');
+      announce('Action forged. Reach the Recheck beacon.');
+      updateHUD();
+      return;
+    }
+
+    if(x===RECHECK.x && y===RECHECK.y) {
+      if(!actionForged) {
+        showToast('RECHECK LOCKED','hot');
+        announce('Recheck is locked until an action is forged.');
+        return;
+      }
+      complete=true;
+      playing=false;
+      winFlashUntil=now+900;
+      frameEl?.classList.remove('is-playing');
+      frameEl?.classList.add('is-complete');
+      spawnBurst(x,y,palette.acid,26);
+      showToast('DECISION TRAIL COMPLETE','acid');
+      updateHUD();
+      announce('Discovery Run complete. Four systems checked, three evidence blocks collected, action forged, and Recheck reached.');
+      if(completeOverlay) {
+        completeOverlay.hidden=false;
+        const restart=completeOverlay.querySelector('[data-world-restart]');
+        setTimeout(()=>restart?.focus(),reduceMotion?0:220);
+      }
+    }
+  }
+
+  function finishMove() {
+    player.gx=player.toX;
+    player.gy=player.toY;
+    player.fromX=player.gx;
+    player.fromY=player.gy;
+    player.moving=false;
+    handleTile(player.gx,player.gy);
+    draw();
+  }
+
+  function move(dx,dy) {
+    if(!playing || complete || player.moving) return;
+
+    const nx=player.gx+dx;
+    const ny=player.gy+dy;
+    if(dx<0) lastDir='left';
+    if(dx>0) lastDir='right';
+
+    if(nx<0||nx>8||ny<0||ny>6) {
+      showToast('WORLD EDGE','hot');
+      announce('That direction is outside the playable world.');
+      return;
+    }
+    if(NOISE.has(keyOf(nx,ny))) {
+      showToast('NOISE BLOCK · TRY ANOTHER PATH','hot');
+      announce('A noise block is in the way. Choose another path.');
+      return;
+    }
+
+    player.fromX=player.gx;
+    player.fromY=player.gy;
+    player.toX=nx;
+    player.toY=ny;
+    player.moveStart=performance.now();
+    player.moving=true;
+
+    if(MOVE_MS===0) {
+      finishMove();
+    } else {
+      ensureLoop();
+    }
+  }
+
+  function startGame() {
+    complete=false;
+    playing=true;
+    frameEl?.classList.remove('is-complete');
+    frameEl?.classList.add('is-playing');
+    startOverlay?.classList.add('is-hidden');
+    if(completeOverlay) completeOverlay.hidden=true;
+    updateHUD();
+    announce('Discovery Run started. Use arrow keys, W A S D, or touch controls. Move onto the AI gate.');
+    canvas.focus({preventScroll:true});
+    ensureLoop();
+  }
+
+  function resetGame({start=false}={}) {
+    playing=false;
+    complete=false;
+    aiChecked=false;
+    actionForged=false;
+    collected=new Set();
+    particles=[];
+    gateFlashUntil=0;
+    forgeFlashUntil=0;
+    winFlashUntil=0;
+    Object.assign(player,{gx:START.x,gy:START.y,fromX:START.x,fromY:START.y,toX:START.x,toY:START.y,moveStart:0,moving:false});
+    frameEl?.classList.remove('is-complete','is-playing');
+    if(completeOverlay) completeOverlay.hidden=true;
+    if(startOverlay) startOverlay.classList.toggle('is-hidden',start);
+    updateHUD();
+    draw();
+    if(start) startGame();
+  }
+
+  function direction(name) {
+    if(name==='up') move(0,-1);
+    if(name==='down') move(0,1);
+    if(name==='left') move(-1,0);
+    if(name==='right') move(1,0);
+  }
+
+  startBtn?.addEventListener('click',startGame);
+  restartBtns.forEach(btn=>btn.addEventListener('click',()=>resetGame({start:true})));
+  moveBtns.forEach(btn=>btn.addEventListener('click',()=>direction(btn.dataset.worldMove)));
+
+  canvas.addEventListener('click',()=>{
+    if(!playing && !complete) startGame();
+    else canvas.focus({preventScroll:true});
   });
 
-  function frame(now){
-    const dt=Math.min(.05,(now-last)/1000);last=now;phase+=dt;
-    draw();
-    if(!reduceMotion) requestAnimationFrame(frame);
+  canvas.addEventListener('keydown',event=>{
+    const k=event.key.toLowerCase();
+    const map={
+      arrowup:'up',w:'up',
+      arrowdown:'down',s:'down',
+      arrowleft:'left',a:'left',
+      arrowright:'right',d:'right'
+    };
+    if(map[k]) {
+      event.preventDefault();
+      direction(map[k]);
+    }
+    if(k==='r') {
+      event.preventDefault();
+      resetGame({start:true});
+    }
+  });
+
+  function tick(now) {
+    rafId=0;
+    if(!inView || document.hidden) return;
+
+    if(now-lastFrame<FPS_INTERVAL) {
+      rafId=requestAnimationFrame(tick);
+      return;
+    }
+    const dt=Math.min(.05,(now-lastFrame)/1000);
+    lastFrame=now;
+    phase+=dt;
+
+    if(player.moving && MOVE_MS>0 && now-player.moveStart>=MOVE_MS) finishMove();
+    updateParticles(dt);
+    draw(now);
+
+    if(!reduceMotion || player.moving || particles.length) rafId=requestAnimationFrame(tick);
   }
-  updateStage(0);
-  if(!reduceMotion) requestAnimationFrame(frame);
+
+  function ensureLoop() {
+    if(!rafId && inView && !document.hidden && (!reduceMotion || player.moving || particles.length)) {
+      lastFrame=performance.now();
+      rafId=requestAnimationFrame(tick);
+    } else if(reduceMotion) {
+      draw();
+    }
+  }
+
+  if('IntersectionObserver' in window) {
+    const observer=new IntersectionObserver(entries=>{
+      inView=entries.some(entry=>entry.isIntersecting);
+      if(inView) ensureLoop();
+      else if(rafId) {
+        cancelAnimationFrame(rafId);
+        rafId=0;
+      }
+    },{rootMargin:'120px 0px',threshold:0});
+    observer.observe(root);
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden && rafId) {
+      cancelAnimationFrame(rafId);
+      rafId=0;
+    } else {
+      ensureLoop();
+    }
+  });
+
+  resetGame();
+  ensureLoop();
 })();
 
 // --- v20260924 Riseklix signal buttons ---
