@@ -1,3 +1,15 @@
+# Canonicalize legacy root HTML copies to folder URLs.
+/about.html /about/ 301!
+/contact.html /contact/ 301!
+/pricing.html /pricing/ 301!
+/privacy.html /privacy/ 301!
+/product.html /product/ 301!
+/resources.html /resources/ 301!
+/services.html /services/ 301!
+/sitemap.html /sitemap/ 301!
+/terms.html /terms/ 301!
+/work.html /work/ 301!
+
 # Legacy short slugs from earlier article drafts.
 /resources/ai-search-visibility-usa-law-firms /resources/ai-search-visibility-usa-law-firms-2026/ 301!
 /resources/ai-search-visibility-usa-franchises /resources/ai-search-visibility-usa-franchises-2026/ 301!
