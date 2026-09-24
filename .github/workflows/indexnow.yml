@@ -1,0 +1,164 @@
+name: Verify production and notify IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.html"
+      - "index.html"
+      - "_redirects"
+      - "sitemap.xml"
+      - "robots.txt"
+      - "91c6d8f7a42e4b90bd8a6e3f5c1702aa.txt"
+      - ".github/workflows/indexnow.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Verify production is the product-first site
+        shell: bash
+        env:
+          INDEXNOW_KEY: "91c6d8f7a42e4b90bd8a6e3f5c1702aa"
+        run: |
+          set -euo pipefail
+          ok=0
+          for attempt in {1..12}; do
+            home="$(curl -fsSL --connect-timeout 8 --max-time 15 https://riseklix.com/ || true)"
+            live_key="$(curl -fsSL --connect-timeout 8 --max-time 15 https://riseklix.com/91c6d8f7a42e4b90bd8a6e3f5c1702aa.txt || true)"
+            if printf '%s' "$home" | grep -q "Commercial Discovery" \
+              && ! printf '%s' "$home" | grep -q "Riseklix Agency" \
+              && [ "$live_key" = "$INDEXNOW_KEY" ]; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "Production verification failed. Refusing to notify IndexNow while riseklix.com is stale or the key file is not live."
+            exit 1
+          fi
+
+      - name: Build changed canonical URL list
+        id: urls
+        shell: bash
+        env:
+          INDEXNOW_KEY_FILE: "91c6d8f7a42e4b90bd8a6e3f5c1702aa.txt"
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$(git rev-parse HEAD^)"
+          fi
+          git diff --name-status "$BEFORE" "${GITHUB_SHA}" > /tmp/changed.txt
+
+          python - <<'PY'
+          from pathlib import Path
+          import os
+
+          changed = Path("/tmp/changed.txt").read_text().splitlines()
+          urls = []
+          key_file = os.environ["INDEXNOW_KEY_FILE"]
+          key_added = False
+
+          def add(url):
+              if url not in urls:
+                  urls.append(url)
+
+          for line in changed:
+              parts = line.split("\t")
+              if len(parts) < 2:
+                  continue
+              status, path = parts[0], parts[-1]
+              if path == key_file and status.startswith("A"):
+                  key_added = True
+
+              if path == "index.html":
+                  add("https://riseklix.com/")
+              elif path.endswith("/index.html") and not path.startswith(".github/"):
+                  add("https://riseklix.com/" + path[:-10])
+              elif path.endswith(".html") and "/" not in path:
+                  add("https://riseklix.com/" + path)
+              elif path == "robots.txt":
+                  add("https://riseklix.com/robots.txt")
+
+          if key_added:
+              seed = [
+                  "https://riseklix.com/",
+                  "https://riseklix.com/about/",
+                  "https://riseklix.com/product/",
+                  "https://riseklix.com/pricing/",
+                  "https://riseklix.com/resources/",
+                  "https://riseklix.com/authors/satwik-kumar/",
+                  "https://riseklix.com/observatory/",
+                  "https://riseklix.com/source-room/",
+                  "https://riseklix.com/resources/ai-search-measurement-methodology-2026/",
+                  "https://riseklix.com/resources/ai-search-volatility-recheck-monitoring-2026/",
+                  "https://riseklix.com/resources/ai-search-funnel-retrieval-citation-recommendation-conversion/",
+                  "https://riseklix.com/resources/how-to-choose-ai-search-prompts-buyer-decision-framework/",
+                  "https://riseklix.com/resources/best-ai-visibility-tools-2026/",
+                  "https://riseklix.com/resources/ai-visibility-score-mentions-citations-recommendations/",
+                  "https://riseklix.com/resources/how-to-get-recommended-by-chatgpt/",
+                  "https://riseklix.com/about.html",
+                  "https://riseklix.com/contact.html",
+                  "https://riseklix.com/pricing.html",
+                  "https://riseklix.com/privacy.html",
+                  "https://riseklix.com/product.html",
+                  "https://riseklix.com/resources.html",
+                  "https://riseklix.com/services.html",
+                  "https://riseklix.com/sitemap.html",
+                  "https://riseklix.com/terms.html",
+                  "https://riseklix.com/work.html"
+              ]
+              for url in seed:
+                  add(url)
+
+          Path("/tmp/indexnow-urls.txt").write_text("\n".join(urls) + ("\n" if urls else ""))
+          print(f"Prepared {len(urls)} IndexNow URL(s).")
+          for u in urls:
+              print(u)
+          PY
+
+          if [ ! -s /tmp/indexnow-urls.txt ]; then
+            echo "has_urls=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_urls=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Submit changed URLs to IndexNow
+        if: steps.urls.outputs.has_urls == 'true'
+        shell: bash
+        env:
+          INDEXNOW_KEY: "91c6d8f7a42e4b90bd8a6e3f5c1702aa"
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          urls=[u.strip() for u in Path("/tmp/indexnow-urls.txt").read_text().splitlines() if u.strip()]
+          payload={
+            "host":"riseklix.com",
+            "key":os.environ["INDEXNOW_KEY"],
+            "keyLocation":"https://riseklix.com/91c6d8f7a42e4b90bd8a6e3f5c1702aa.txt",
+            "urlList":urls
+          }
+          Path("/tmp/indexnow.json").write_text(json.dumps(payload))
+          PY
+
+          code="$(curl -sS -o /tmp/indexnow-response.txt -w '%{http_code}' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            --data-binary @/tmp/indexnow.json \
+            https://api.indexnow.org/indexnow)"
+
+          echo "IndexNow HTTP $code"
+          cat /tmp/indexnow-response.txt || true
+          if [ "$code" != "200" ] && [ "$code" != "202" ]; then
+            exit 1
+          fi
