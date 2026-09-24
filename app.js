@@ -1406,21 +1406,7 @@ if ('IntersectionObserver' in window) {
       calendly_event: data.event,
     });
   });
-
-  // Button ripple — decorative only, never blocks clicks.
   if (!reduceMotion) {
-    document.querySelectorAll('.btn').forEach((btn) => {
-      btn.addEventListener('pointerdown', (event) => {
-        const rect = btn.getBoundingClientRect();
-        const ripple = document.createElement('span');
-        ripple.className = 'rk-ripple';
-        ripple.style.left = `${event.clientX - rect.left}px`;
-        ripple.style.top = `${event.clientY - rect.top}px`;
-        btn.appendChild(ripple);
-        window.setTimeout(() => ripple.remove(), 620);
-      });
-    });
-
     // Card spotlight on hover for pointer devices only.
     if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
       document.querySelectorAll('.card,.service-card,.case,.tagbox,.kpi,.process-item').forEach((el) => {
