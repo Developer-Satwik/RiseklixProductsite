@@ -98,10 +98,9 @@ jobs:
               if ".git" in path.parts:
                   continue
               text = path.read_text(encoding="utf-8")
-              touched = False
+              touched = [False]
 
               def repl(match):
-                  nonlocal_holder = {"touched": False}
                   raw = match.group(1)
                   try:
                       data = json.loads(raw)
@@ -111,15 +110,12 @@ jobs:
                   normalize(data)
                   after = json.dumps(data, sort_keys=True, separators=(",", ":"))
                   if before != after:
-                      nonlocal_holder["touched"] = True
-                  if nonlocal_holder["touched"]:
-                      nonlocal touched
-                      touched = True
+                      touched[0] = True
                       return '<script type="application/ld+json">' + json.dumps(data, separators=(",", ":")) + '</script>'
                   return match.group(0)
 
               updated = script_re.sub(repl, text)
-              if touched and updated != text:
+              if touched[0] and updated != text:
                   path.write_text(updated, encoding="utf-8")
                   changed_files += 1
 
