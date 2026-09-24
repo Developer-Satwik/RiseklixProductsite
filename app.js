@@ -1925,3 +1925,206 @@ if ('IntersectionObserver' in window) {
 
   setState(active);
 })();
+
+// --- v20260924 Riseklix Discovery World ---
+(() => {
+  const root = document.querySelector('[data-discovery-world]');
+  if (!root) return;
+  const canvas = root.querySelector('[data-world-canvas]');
+  if (!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+  const stageLabel = root.querySelector('[data-world-stage]');
+  const stageCopy = root.querySelector('[data-world-copy]');
+  const controls = Array.from(root.querySelectorAll('[data-world-step]'));
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const W = canvas.width, H = canvas.height;
+  const TILE_W = 68, TILE_H = 34, CUBE_H = 34;
+  const ORIGIN_X = 375, ORIGIN_Y = 165;
+  let stage = 0;
+  let renderStage = 0;
+  let last = performance.now();
+  let phase = 0;
+
+  const stages = [
+    {label:'01 / START AT YOUR SITE',copy:'Research the business before testing the market.',pos:[0,4]},
+    {label:'02 / CROSS THE AI GATES',copy:'The same buying decision can produce different answers.',pos:[2,3]},
+    {label:'03 / COLLECT THE EVIDENCE',copy:'Trace answers back to sources, competitors, and proof.',pos:[4,3]},
+    {label:'04 / FORGE THE ACTION',copy:'Turn the clearest supported gap into something you can change.',pos:[5,5]},
+    {label:'05 / RECHECK THE PATH',copy:'Run the same decision again and see what moved.',pos:[7,3]}
+  ];
+
+  const palette = {
+    top:'#17223e', left:'#0c1429', right:'#101b34',
+    acid:'#c7ff2d', cyan:'#38d4ff', violet:'#8d54ff', hot:'#ff3ea5',
+    paper:'#f5f0e8', blue:'#214cff', ink:'#050509', amber:'#ffb01f'
+  };
+
+  const iso = (gx, gy, z=0) => ({
+    x: ORIGIN_X + (gx - gy) * TILE_W / 2,
+    y: ORIGIN_Y + (gx + gy) * TILE_H / 2 - z * CUBE_H
+  });
+
+  const poly = (pts, fill, stroke='rgba(255,255,255,.07)') => {
+    ctx.beginPath();
+    pts.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+    ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+    if (stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}
+  };
+
+  const cube = (gx,gy,z=0,h=1,top=palette.top,left=palette.left,right=palette.right) => {
+    const p=iso(gx,gy,z), up=h*CUBE_H;
+    const T={x:p.x,y:p.y-up}, L={x:p.x-TILE_W/2,y:p.y-TILE_H/2}, R={x:p.x+TILE_W/2,y:p.y-TILE_H/2};
+    const BL={x:p.x-TILE_W/2,y:p.y-TILE_H/2+up}, BR={x:p.x+TILE_W/2,y:p.y-TILE_H/2+up};
+    poly([{x:T.x,y:T.y},{x:L.x,y:L.y-up},{x:p.x,y:p.y-TILE_H-up},{x:R.x,y:R.y-up}],top);
+    poly([{x:T.x,y:T.y},{x:L.x,y:L.y-up},{x:BL.x,y:BL.y},{x:p.x,y:p.y}],left);
+    poly([{x:T.x,y:T.y},{x:R.x,y:R.y-up},{x:BR.x,y:BR.y},{x:p.x,y:p.y}],right);
+  };
+
+  const textPixel = (txt,x,y,size=12,color='#fff',align='center') => {
+    ctx.save();
+    ctx.font = `800 ${size}px "IBM Plex Mono", monospace`;
+    ctx.textAlign=align;ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(0,0,0,.52)';ctx.fillText(txt,x+2,y+2);
+    ctx.fillStyle=color;ctx.fillText(txt,x,y);ctx.restore();
+  };
+
+  const drawGround = () => {
+    for(let gy=0;gy<7;gy++){
+      for(let gx=0;gx<9;gx++){
+        const d=(gx+gy)%2;
+        cube(gx,gy,0,1,d?'#101a30':'#121e37',d?'#091224':'#0a1327',d?'#0b1730':'#0c1932');
+      }
+    }
+    // acid path through the world
+    [[0,4],[1,4],[2,3],[3,3],[4,3],[5,4],[5,5],[6,4],[7,3]].forEach(([x,y],i)=>{
+      const p=iso(x,y,1.02);
+      poly([{x:p.x,y:p.y-2},{x:p.x-TILE_W/2,y:p.y-TILE_H/2-2},{x:p.x,y:p.y-TILE_H-2},{x:p.x+TILE_W/2,y:p.y-TILE_H/2-2}],i<=stage*2?palette.acid:'rgba(199,255,45,.12)',null);
+    });
+  };
+
+  const building = (gx,gy,h,color,label) => {
+    const left=color==='acid'?'#526d0b':color==='cyan'?'#0c5264':color==='violet'?'#3d246c':'#14266f';
+    const right=color==='acid'?'#6d900e':color==='cyan'?'#116b82':color==='violet'?'#523090':'#1a3190';
+    const top=color==='acid'?palette.acid:color==='cyan'?palette.cyan:color==='violet'?palette.violet:palette.blue;
+    cube(gx,gy,1,h,top,left,right);
+    const p=iso(gx,gy,1+h);
+    textPixel(label,p.x,p.y-18,9,top);
+  };
+
+  const beacon = (gx,gy,color,label,active=false) => {
+    cube(gx,gy,1,0.34,color,'#111827','#17213c');
+    const p=iso(gx,gy,1.34);
+    ctx.save();
+    ctx.globalAlpha=active?(.72+.22*Math.sin(phase*4)):.28;
+    ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=active?26:8;
+    ctx.beginPath();ctx.arc(p.x,p.y-15,active?8:5,0,Math.PI*2);ctx.fill();ctx.restore();
+    textPixel(label,p.x,p.y-34,8,active?color:'#756f82');
+  };
+
+  const character = (gx,gy) => {
+    const p=iso(gx,gy,1.08);
+    const bob=reduceMotion?0:Math.sin(phase*5)*3;
+    ctx.save();
+    ctx.translate(Math.round(p.x),Math.round(p.y-38+bob));
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(-13,29,26,7);
+    // body
+    ctx.fillStyle=palette.blue;ctx.fillRect(-12,-2,24,28);
+    ctx.fillStyle='#132aaa';ctx.fillRect(-12,17,24,9);
+    // head
+    ctx.fillStyle=palette.paper;ctx.fillRect(-14,-23,28,22);
+    // hair/mark
+    ctx.fillStyle=palette.ink;ctx.fillRect(-14,-23,28,7);
+    ctx.fillStyle=palette.acid;ctx.fillRect(-9,-17,7,7);
+    ctx.fillStyle=palette.ink;ctx.fillRect(5,-13,4,4);
+    // legs
+    ctx.fillStyle=palette.paper;ctx.fillRect(-10,26,8,11);ctx.fillRect(3,26,8,11);
+    ctx.restore();
+  };
+
+  const evidenceCrystal = (active) => {
+    const p=iso(4,3,1.4);
+    ctx.save();ctx.translate(p.x,p.y-22);
+    ctx.globalAlpha=active?1:.35;
+    ctx.fillStyle=palette.cyan;ctx.shadowColor=palette.cyan;ctx.shadowBlur=active?24:6;
+    poly([{x:0,y:-19},{x:-11,y:-2},{x:-6,y:15},{x:7,y:15},{x:12,y:-2}],palette.cyan,null);
+    ctx.restore();
+    textPixel('EVIDENCE',p.x,p.y-56,8,active?palette.cyan:'#706b7c');
+  };
+
+  const actionForge = (active) => {
+    building(5,5,1.2,'violet','ACTION');
+    const p=iso(5,5,2.25);
+    ctx.save();ctx.globalAlpha=active?(.7+.3*Math.sin(phase*5)):.15;ctx.fillStyle=palette.hot;ctx.shadowColor=palette.hot;ctx.shadowBlur=22;ctx.fillRect(p.x-10,p.y-18,20,12);ctx.restore();
+  };
+
+  const draw = () => {
+    ctx.clearRect(0,0,W,H);
+    // sky
+    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#081633');g.addColorStop(.58,'#0c1021');g.addColorStop(1,'#050509');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    // stars / pixels
+    ctx.fillStyle='rgba(255,255,255,.17)';
+    for(let i=0;i<42;i++){const x=(i*83)%W,y=(i*47)%240;ctx.fillRect(x,y,(i%3)+1,(i%3)+1);}
+    // distant block skyline
+    ctx.globalAlpha=.25;
+    for(let i=0;i<9;i++){const h=16+(i%4)*13;ctx.fillStyle=i%2?palette.violet:palette.blue;ctx.fillRect(i*95-30,115-h,54,h);}
+    ctx.globalAlpha=1;
+
+    drawGround();
+    building(0,4,1.45,'blue','YOUR SITE');
+    building(7,1,2.15,'violet','ALT');
+    beacon(2,2,palette.acid,'GPT',stage>=1);
+    beacon(2,3,palette.cyan,'GEM',stage>=1);
+    beacon(3,2,palette.violet,'CLD',stage>=1);
+    beacon(3,3,palette.hot,'PPLX',stage>=1);
+    evidenceCrystal(stage>=2);
+    actionForge(stage>=3);
+    beacon(7,3,palette.acid,'RECHECK',stage>=4);
+
+    const [tx,ty]=stages[stage].pos;
+    const [px,py]=stages[renderStage].pos;
+    character(px,py);
+
+    // tiny signposts
+    const cp=iso(7,1,3.25); textPixel('COMPETITOR',cp.x,cp.y-20,7,'#a49eaf');
+  };
+
+  function updateStage(next){
+    stage=(next+stages.length)%stages.length;
+    renderStage=stage;
+    if(stageLabel) stageLabel.textContent=stages[stage].label;
+    if(stageCopy) stageCopy.textContent=stages[stage].copy;
+    controls.forEach((b,i)=>b.classList.toggle('is-active',i===stage));
+    draw();
+  }
+
+  controls.forEach((btn,i)=>{
+    btn.addEventListener('click',()=>updateStage(i));
+    btn.addEventListener('keydown',(e)=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+      e.preventDefault();
+      let n=i;
+      if(e.key==='ArrowLeft') n=(i-1+controls.length)%controls.length;
+      if(e.key==='ArrowRight') n=(i+1)%controls.length;
+      if(e.key==='Home') n=0;
+      if(e.key==='End') n=controls.length-1;
+      controls[n].focus();updateStage(n);
+    });
+  });
+  canvas.tabIndex=0;
+  canvas.addEventListener('click',()=>updateStage(stage+1));
+  canvas.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'){e.preventDefault();updateStage(stage+1);}
+    if(e.key==='ArrowLeft'){e.preventDefault();updateStage(stage-1);}
+  });
+
+  function frame(now){
+    const dt=Math.min(.05,(now-last)/1000);last=now;phase+=dt;
+    draw();
+    if(!reduceMotion) requestAnimationFrame(frame);
+  }
+  updateStage(0);
+  if(!reduceMotion) requestAnimationFrame(frame);
+})();
