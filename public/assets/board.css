@@ -249,6 +249,7 @@ a.folder:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:0 26px 50px 
 @media (max-width:560px){.row2{grid-template-columns:minmax(0,1fr)}}
 .formnote{font-size:14px;color:rgba(9,12,34,.72);margin:14px 0 0}
 .status{margin-top:16px;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--accent-ink)}
+.status a{color:inherit;text-decoration:underline;text-underline-offset:3px;font-weight:500}
 .card .stamp.big{top:auto;bottom:20px;right:24px;font-size:14px;padding:6px 10px;opacity:0;transform:rotate(-9deg) scale(1.6);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}
 .card.sent .stamp.big{opacity:1;transform:rotate(-9deg) scale(1)}
 @media (max-width:900px){.intake-grid{grid-template-columns:minmax(0,1fr)}}

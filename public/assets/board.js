@@ -432,7 +432,20 @@ if (intakeForm) intakeForm.addEventListener("submit", function(e){
       st.textContent = "Received. You'll get the scope and the price by email within one working day.";
       try { if (window.gtag) window.gtag("event", "generate_lead", { form: "case-intake", need: $("#f-need").value }); } catch (err) {}
     })
-    .catch(function(){ btn.disabled = false; st.textContent = "That didn't send. Please email contact@riseklix.com and we'll take it from there."; });
+    .catch(function(){
+      btn.disabled = false;
+      var f = new FormData(card), need = $("#f-need"), lines = [];
+      if (need && need.selectedOptions[0]) lines.push("What I need: " + need.selectedOptions[0].textContent);
+      [["site", "Website or idea"], ["email", "Reply to"], ["buyers", "Who I sell to"], ["comps", "Competitors"], ["market", "Main market"], ["notes", "Notes"]].forEach(function(row){
+        var v = String(f.get(row[0]) || "").trim(); if (v) lines.push(row[1] + ": " + v);
+      });
+      var link = document.createElement("a");
+      link.href = "mailto:contact@riseklix.com?subject=" + encodeURIComponent("Open my case") + "&body=" + encodeURIComponent(lines.join("\n"));
+      link.textContent = "Send it by email instead";
+      st.textContent = "That didn't send. ";
+      st.appendChild(link);
+      st.appendChild(document.createTextNode(". Your answers are already filled in."));
+    });
 });
 var mbtns = $$(".motion-btn"), mnote = $("#mnote");
 function paintToggle(){ mbtns.forEach(function(b){ b.setAttribute("aria-pressed", FULL() ? "true" : "false"); b.textContent = FULL() ? "Motion: full" : "Motion: calm"; }); }
