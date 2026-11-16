@@ -1,0 +1,49 @@
+# Riseklix
+
+> Riseklix is a research firm for service businesses. We record how ChatGPT, Gemini, Claude, Perplexity and Google AI Overviews answer the questions buyers ask before they hire a firm, trace which sources each answer relied on, and show what to fix. We also run market research and idea validation.
+
+Canonical site: https://riseklix.com/
+Contact: contact@riseklix.com
+Founder: Satwik Kumar
+Based in: New Delhi, India. Works with firms in the UK, US, Europe and Australia.
+Founded: 2024
+
+## Services and prices
+
+- AI Discovery Study: 10 buyer situations x 4 questions x 5 AI tools (ChatGPT, Gemini, Claude, Perplexity and Google AI Overviews), about 200 recorded answers. Delivers shortlists, source trails, competitor pages and ranked fixes. From US$250, paid upfront.
+- Monthly tracking: the agreed questions tracked three times a month, with two runs per AI tool. US$400 to US$600 a month.
+- Implementation: page rewrites, decision pages, articles, profile and directory clean-up. Quoted per scope, after a study.
+- Market research and idea validation: demand, market sizing, history, competitor teardowns and pricing, ending in a go, pivot or not-yet verdict. Quoted per scope.
+- Research partnership: flagship reports, monthly market and competitor briefs, resources and models. Quoted per scope, monthly.
+- Partners: research behind agency and consultant advice, delivered under the partner's name.
+
+## What Riseklix does not promise
+
+- A ranking. AI answers don't have one.
+- Guaranteed placement in any AI tool.
+- That money buys recommendations.
+
+## Key pages
+
+- [Home](https://riseklix.com/): what a study covers, how it runs, prices and questions.
+- [AI Discovery Study](https://riseklix.com/ai-discovery-study/): scope, what you receive, process and price.
+- [Pricing](https://riseklix.com/pricing/): every service, with prices and terms.
+- [How a study works](https://riseklix.com/how-it-works/): the method, how answers are counted, and what a study can't prove.
+- [Market research](https://riseklix.com/market-research/): idea validation, market studies and the research partnership.
+- [Case files](https://riseklix.com/case-studies/): anonymised studies of a UK recruitment firm, a US training firm and a US commercial contractor.
+- [Case file 003](https://riseklix.com/case-studies/us-commercial-contractor/): a US commercial contractor recommended in 15 of 50 AI answers, always under its parent company's name.
+- [Insights](https://riseklix.com/resources/): 50 guides, checklists and research notes.
+- [About](https://riseklix.com/about/): who Riseklix is and how it works.
+- [Satwik Kumar](https://riseklix.com/authors/satwik-kumar/): founder and author.
+- [Contact](https://riseklix.com/contact/): the enquiry form.
+
+## Research articles
+
+- [Why AI Recommends Your Competitors: 5 Patterns](https://riseklix.com/resources/why-ai-recommends-your-competitors/): We record AI answers to real buyer questions. Here are the five patterns that decide who gets recommended, and what to change on your side.
+- [Google AI Overviews: How to Check If Your Firm Is Cited](https://riseklix.com/resources/google-ai-overviews-for-service-firms/): A simple way to check whether Google AI Overviews mention or link your firm, what to record each time, and what tends to get a service firm included.
+- [Businesses in ChatGPT: What the Dashboard Shows, Misses](https://riseklix.com/resources/businesses-in-chatgpt-explained/): OpenAI's Businesses in ChatGPT lets you claim a profile and see mentions. Here is what the dashboard counts, what it can't see, and what to do next.
+- [How to Validate a Business Idea: 6 Questions to Answer](https://riseklix.com/resources/how-to-validate-a-business-idea/): Before you build, answer six questions with evidence: demand, market size, history, competitors, pricing and the verdict. A practical checklist.
+- [Competitor Analysis: See How Rivals Actually Execute](https://riseklix.com/resources/competitor-analysis-how-competitors-execute/): A competitor analysis that goes past feature lists: positioning, pricing pages, channels, hiring, reviews and what AI says. With a teardown template.
+- [Pricing Research: How to Find What Buyers Will Pay](https://riseklix.com/resources/pricing-research-what-buyers-will-pay/): A practical way to set a first price: collect public price points, build a price band, study packaging, then test with buyers before you commit.
+- [AI Visibility for Recruitment Firms: What a Study Found](https://riseklix.com/resources/ai-visibility-for-recruitment-firms/): We recorded 352 AI answers for one recruitment firm. It was recommended 27 of 32 times for one hire and 4 of 32 for another. Here is why.
+- [AI Visibility for Commercial Contractors: What We Found](https://riseklix.com/resources/ai-visibility-for-commercial-contractors/): We asked five AI tools what developers and property managers ask about commercial roofing and siding. 50 answers showed who gets shortlisted, and why.
