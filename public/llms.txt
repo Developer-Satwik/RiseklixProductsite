@@ -12,7 +12,7 @@ Founded: 2024
 
 - AI Discovery Study: 10 buyer situations x 4 questions x 5 AI tools (ChatGPT, Gemini, Claude, Perplexity and Google AI Overviews), about 200 recorded answers. Delivers shortlists, source trails, competitor pages and ranked fixes. From US$250, paid upfront.
 - Monthly tracking: the agreed questions tracked three times a month, with two runs per AI tool. US$400 to US$600 a month.
-- Implementation: page rewrites, decision pages, articles, profile and directory clean-up. Quoted per scope, after a study.
+- Implementation: closing the evidence gaps a study finds, on the firm's website and beyond it: articles, LinkedIn and Reddit content, video, directories, reviews and press. Quoted per scope, after a study.
 - Market research and idea validation: demand, market sizing, history, competitor teardowns and pricing, ending in a go, pivot or not-yet verdict. Quoted per scope.
 - Research partnership: flagship reports, monthly market and competitor briefs, resources and models. Quoted per scope, monthly.
 - Partners: research behind agency and consultant advice, delivered under the partner's name.
@@ -27,6 +27,7 @@ Founded: 2024
 
 - [Home](https://riseklix.com/): what a study covers, how it runs, prices and questions.
 - [AI Discovery Study](https://riseklix.com/ai-discovery-study/): scope, what you receive, process and price.
+- [Implementation](https://riseklix.com/implementation/): the ten ways Riseklix gets a firm cited, with the evidence for each.
 - [Pricing](https://riseklix.com/pricing/): every service, with prices and terms.
 - [How a study works](https://riseklix.com/how-it-works/): the method, how answers are counted, and what a study can't prove.
 - [Market research](https://riseklix.com/market-research/): idea validation, market studies and the research partnership.
@@ -34,6 +35,7 @@ Founded: 2024
 - [Case file 003](https://riseklix.com/case-studies/us-commercial-contractor/): a US commercial contractor recommended in 15 of 50 AI answers, always under its parent company's name.
 - [Insights](https://riseklix.com/resources/): 50 guides, checklists and research notes.
 - [About](https://riseklix.com/about/): who Riseklix is and how it works.
+- [Earlier work](https://riseklix.com/work/): content and social case studies from before the research focus.
 - [Satwik Kumar](https://riseklix.com/authors/satwik-kumar/): founder and author.
 - [Contact](https://riseklix.com/contact/): the enquiry form.
 

@@ -73,6 +73,8 @@ a{color:inherit}
 .hub-links a:hover{color:var(--frost);border-bottom-color:rgba(255,255,255,.6)}
 .prose code{font-family:var(--mono);font-size:.9em;background:rgba(9,9,11,.06);padding:.1em .35em;border-radius:5px}
 .card:not([data-topic]){min-height:0}
+.work-fig{margin:0 0 1.8em}
+.work-fig img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line-l);box-shadow:var(--e1)}
 @media (min-width:1180px){.agrid.agrid-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:30px 0 0;border-top:1px solid var(--line-d);border-bottom:1px solid var(--line-d);max-width:900px}
 .facts div{padding:14px 16px 14px 0;min-width:0}

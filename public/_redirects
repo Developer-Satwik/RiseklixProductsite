@@ -9,17 +9,15 @@
 /privacy.html     /privacy/        301!
 /terms.html       /terms/          301!
 /product.html     /ai-discovery-study/  301!
-/services.html    /ai-discovery-study/  301!
-/work.html        /case-studies/   301!
+/services.html    /implementation/      301!
+/work.html        /work/           301!
 /sitemap.html     /resources/      301!
 
 # Old pages that have a new home
 /product          /ai-discovery-study/  301
 /product/*        /ai-discovery-study/  301
-/services         /ai-discovery-study/  301
-/services/*       /ai-discovery-study/  301
-/work             /case-studies/   301
-/work/*           /case-studies/   301
+/services         /implementation/      301
+/services/*       /implementation/      301
 /observatory      /resources/      301
 /observatory/*    /resources/      301
 /source-room      /resources/      301
